@@ -10,7 +10,7 @@ const ProductCard = ({product, onPress, style}) => {
   const image = product.photos && product.photos[0];
   return (
     <TouchableOpacity
-      style={style || styles.block}
+      style={[styles.block, {...style}]}
       onPress={() => onPress && onPress(product.id)}>
       <ProgressiveImage
         loadingIndicatorSize="large"
@@ -30,6 +30,10 @@ const ProductCard = ({product, onPress, style}) => {
       </View>
     </TouchableOpacity>
   );
+};
+
+ProductCard.defaultProps = {
+  style: {}
 };
 
 ProductCard.propTypes = {
