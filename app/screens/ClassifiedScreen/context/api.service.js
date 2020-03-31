@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const API_BASE_URL = 'http://localhost:3004';
+export const API_BASE_URL = 'https://classifiedserver.herokuapp.com';
 
 const instance = axios.create({
   baseURL: API_BASE_URL,
