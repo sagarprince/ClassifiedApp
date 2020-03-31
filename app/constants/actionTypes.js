@@ -1,0 +1,3 @@
+// dashboard
+export const SHOW_DASHBOARD = 'SHOW_DASHBOARD';
+export const SHOW_DASHBOARD_ASYNC = 'SHOW_DASHBOARD_ASYNC';
