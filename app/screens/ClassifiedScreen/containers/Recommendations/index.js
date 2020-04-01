@@ -21,7 +21,7 @@ const MyRecommendations = () => {
 
   const onPress = useCallback(
     id => {
-      navigation.navigate('CategoryActions', {id});
+      // navigation.navigate('CategoryActions', {id});
     },
     [navigation],
   );
