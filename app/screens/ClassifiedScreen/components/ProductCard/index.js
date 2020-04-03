@@ -1,31 +1,34 @@
 // Core
 import React from 'react';
 import PropTypes from 'prop-types';
-import {StyleSheet, TouchableOpacity, Platform, View} from 'react-native';
-import {Text, Icon} from 'native-base';
+import { StyleSheet, TouchableOpacity, Platform, View } from 'react-native';
+import { Text, Icon } from 'native-base';
 // Components
 import ProgressiveImage from '../ProgressiveImage';
 
-const ProductCard = ({product, onPress, style}) => {
-  const image = product.photos && product.photos[0];
+const ProductCard = ({ product, onPress, style }) => {
+  const placeholder = 'https://www.preston-ps.vic.edu.au/images/No_Image_Available-1.jpg';
+  const photo = product.photos && product.photos.length > 0 ?
+    product.photos[0] : {};
   return (
     <TouchableOpacity
-      style={[styles.block, {...style}]}
+      style={[styles.block, { ...style }]}
       onPress={() => onPress && onPress(product.id)}>
       <ProgressiveImage
         loadingIndicatorSize="large"
-        source={{uri: image}}
+        placeholderSource={{ uri: photo.thumbUrl || placeholder }}
+        source={{ uri: photo.url || placeholder }}
         style={styles.image}
       />
       <View style={styles.info}>
-        <Text style={styles.name}>{product.name}</Text>
+        <Text style={styles.name} numberOfLines={1}>{product.title}</Text>
         <View style={styles.row}>
           <Icon type="FontAwesome" name="inr" style={styles.icon} />
           <Text style={styles.price}>{product.price}</Text>
         </View>
         <View style={styles.row}>
           <Icon type="FontAwesome" name="map-marker" style={styles.icon} />
-          <Text style={styles.address}>{product.address}</Text>
+          <Text style={styles.address} numberOfLines={1}>{product.address}</Text>
         </View>
       </View>
     </TouchableOpacity>

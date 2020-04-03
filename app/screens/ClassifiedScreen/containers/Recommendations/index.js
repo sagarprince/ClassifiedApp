@@ -16,7 +16,7 @@ import {ClassifiedContext} from '../../context';
 import ProductCard from '../../components/ProductCard';
 
 const MyRecommendations = () => {
-  const {recommendations, loadRecommendations} = useContext(ClassifiedContext);
+  const {recommendations, fetchRecommendations} = useContext(ClassifiedContext);
   const navigation = useNavigation();
 
   const onPress = useCallback(
@@ -28,7 +28,7 @@ const MyRecommendations = () => {
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
-      loadRecommendations();
+      fetchRecommendations();
     });
     return () => cancelAnimationFrame(frame);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -43,9 +43,9 @@ const MyRecommendations = () => {
       {recommendations.error !== '' && (
         <Text style={styles.error}>{recommendations.error}</Text>
       )}
-      {!recommendations.isLoading && recommendations.entities.length === 0 && (
+      {!recommendations.isLoading && recommendations.error === '' && recommendations.entities.length === 0 && (
         <View style={styles.noResults}>
-          <Text>No Recommendations Found...</Text>
+          <Text>No Recommendations Listed.</Text>
         </View>
       )}
       <FlatList

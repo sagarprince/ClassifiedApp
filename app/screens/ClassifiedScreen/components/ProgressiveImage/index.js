@@ -65,7 +65,6 @@ class ProgressiveImage extends React.Component {
           source={source}
           style={[styles.imageOverlay, {opacity: this.imageAnimated}]}
           onLoad={this.onImageLoad}
-          blurRadius={1}
         />
       </View>
     );
