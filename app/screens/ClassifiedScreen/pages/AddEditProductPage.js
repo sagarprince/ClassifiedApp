@@ -36,6 +36,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   padding: {
+    paddingVertical: 15,
     paddingHorizontal: 15,
   },
   heading: {

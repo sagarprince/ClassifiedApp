@@ -9,6 +9,7 @@ import { useParentNavigation, useCategory } from '../hooks';
 
 // Components
 import ContentView from '../components/ContentView';
+import TopLocationBar from '../containers/TopLocationBar';
 
 export default function CategoryPage() {
   const navigation = useParentNavigation();
@@ -18,6 +19,7 @@ export default function CategoryPage() {
 
   return (
     <Container style={styles.container}>
+      <TopLocationBar />
       <ContentView style={styles.padding}>
         <View style={styles.centered}>
           <View style={styles.headingIcon}>

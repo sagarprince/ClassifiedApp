@@ -4,8 +4,14 @@ import { categories } from './categories';
 import apiService from './api.service';
 
 const initialState = {
+  currentLocation: '',
   search: '',
   categories: categories,
+  places: {
+    isLoading: true,
+    entities: [],
+    error: '',
+  },
   products: {
     isLoading: true,
     entities: [],
@@ -33,6 +39,17 @@ const ClassifiedContext = React.createContext();
 
 function ClassifiedProvider(props) {
   const [state, dispatch] = useReducer(reducer, initialState);
+
+  const setPlaces = payload => {
+    dispatch({
+      payload: {
+        places: {
+          ...state.places,
+          ...payload,
+        },
+      },
+    });
+  };
 
   const setRecommendations = payload => {
     dispatch({
@@ -76,6 +93,30 @@ function ClassifiedProvider(props) {
         },
       },
     });
+  };
+
+  const fetchPlaces = (searchTerm) => {
+    requestAnimationFrame(() => {
+      setPlaces({ isLoading: true, error: '' });
+      apiService.fetchPlaces(searchTerm)
+        .then(entities => {
+          setPlaces({ entities, isLoading: false, error: '' });
+        })
+        .catch(err => {
+          setPlaces({
+            error: err.toString() || 'Something went wrong, please try again.',
+            isLoading: false,
+          });
+        });
+    });
+  };
+
+  const fetchForwardGeocode = (address) => {
+    return apiService.fetchForwardGeocode(address);
+  };
+
+  const fetchReverseGeocode = (location) => {
+    return apiService.fetchReverseGeocode(location);
   };
 
   const fetchRecommendations = () => {
@@ -146,6 +187,10 @@ function ClassifiedProvider(props) {
   const providerValue = {
     ...state,
     dispatch,
+    setPlaces,
+    fetchPlaces,
+    fetchForwardGeocode,
+    fetchReverseGeocode,
     fetchRecommendations,
     fetchProducts,
     fetchAlerts,

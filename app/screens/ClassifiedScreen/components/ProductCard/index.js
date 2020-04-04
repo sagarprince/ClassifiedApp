@@ -107,6 +107,7 @@ const styles = StyleSheet.create({
     color: '#39405B',
     fontWeight: '400',
     fontSize: 15,
+    paddingRight: 10,
   },
 });
 

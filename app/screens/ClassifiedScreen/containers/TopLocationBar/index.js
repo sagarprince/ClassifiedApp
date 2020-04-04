@@ -1,19 +1,21 @@
 // Core
-import React, {useCallback} from 'react';
-import {StyleSheet, View, TouchableOpacity} from 'react-native';
-import {Icon} from 'native-base';
-import {useNavigation} from '@react-navigation/native';
+import React, { useState, useCallback, useContext } from 'react';
+import { StyleSheet, View, TouchableOpacity } from 'react-native';
+import { Text, Icon } from 'native-base';
+import { useNavigation } from '@react-navigation/native';
 
 // Hooks
-import {useFormInput} from '../../hooks';
+import { useFormInput } from '../../hooks';
+
+// Context
+import { ClassifiedContext } from '../../context';
 
 // Components
-import LocationInput from '../../components/LocationInput';
+import PlacesAutocompleteModal from '../../components/PlacesAutocompleteModal';
 
 const TopLocationBar = () => {
-  const {value: location, onChange: setLocation} = useFormInput(
-    'Pune, Maharashtra',
-  );
+  const [isModalVisible, setModalVisible] = useState(false);
+  const { currentLocation, dispatch } = useContext(ClassifiedContext);
   const navigation = useNavigation();
 
   const gotoAlerts = useCallback(() => {
@@ -22,10 +24,18 @@ const TopLocationBar = () => {
 
   return (
     <View style={styles.container}>
-      <LocationInput value={location} onChange={setLocation} />
-      <TouchableOpacity onPress={gotoAlerts}>
-        <Icon type="FontAwesome" name="bell-o" style={styles.icon} />
+      <TouchableOpacity style={styles.setLocationBtn} onPress={() => setModalVisible(true)}>
+        <Icon type="Feather" name="map-pin" style={styles.locationIcon} />
+        {!currentLocation && <Text style={styles.placeholder} numberOfLines={1}>Your Location</Text>}
+        <Text style={styles.location} numberOfLines={1}>{currentLocation}</Text>
       </TouchableOpacity>
+      <TouchableOpacity onPress={gotoAlerts}>
+        <Icon type="FontAwesome" name="bell-o" style={styles.alertsIcon} />
+      </TouchableOpacity>
+      <PlacesAutocompleteModal visible={isModalVisible}
+        onChangeLocation={(value) => dispatch({ payload: { currentLocation: value.name } })}
+        onClose={() => setModalVisible(false)}
+      />
     </View>
   );
 };
@@ -39,7 +49,30 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     paddingRight: 15,
   },
-  icon: {
+  setLocationBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingTop: 4,
+    height: 55,
+    backgroundColor: 'transparent',
+    width: '82%'
+  },
+  placeholder: {
+    marginLeft: 5,
+    fontSize: 16,
+    color: '#acacac'
+  },
+  location: {
+    marginLeft: 5,
+    paddingRight: 10,
+    fontSize: 16,
+    color: '#444',
+  },
+  locationIcon: {
+    fontSize: 24,
+    color: '#8EBF37',
+  },
+  alertsIcon: {
     color: '#333',
     fontSize: 26,
   },

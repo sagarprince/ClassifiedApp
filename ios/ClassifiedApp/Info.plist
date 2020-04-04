@@ -81,5 +81,17 @@
 	<string>Your message to user when the photo library is accessed for the first time</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Your message to user when the photo library is accessed for the first time</string>
+	<key>NSLocationAlwaysAndWhenInUsageDescription</key>
+	<string>Always and in usage permissions</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>always permissions</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string></string>
+	<key>NSLocationAlwaysAndWhenInUsageDescription</key>
+	<string>Always and in usage permissions</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>always permissions</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string></string>
 </dict>
 </plist>

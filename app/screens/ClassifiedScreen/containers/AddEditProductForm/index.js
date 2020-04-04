@@ -1,9 +1,9 @@
 // Core
-import React, { useContext, useCallback, useRef } from 'react';
+import React, { useContext, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { StyleSheet, View, Text, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Button, Icon, Toast } from 'native-base';
+import { Button, Toast } from 'native-base';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 
@@ -11,7 +11,7 @@ import * as Yup from 'yup';
 import { ClassifiedContext } from '../../context';
 
 // Components
-import { FormInput, FormSelect, FormImagesInput } from '../../components/FormFields';
+import { FormInput, FormSelect, FormImagesInput, FormLocationInput } from '../../components/FormFields';
 
 const AddEditProductForm = ({ categoryId, type, mode }) => {
     const navigation = useNavigation();
@@ -35,7 +35,9 @@ const AddEditProductForm = ({ categoryId, type, mode }) => {
             ),
         frequency: Yup.string()
             .required('This is a required field.'),
-        photos: Yup.array().required('Please upload product images.')
+        photos: Yup.array().required('Please upload product images.'),
+        address: Yup.string()
+            .required('Please select a location.'),
     });
 
     const frequencyOptions = [
@@ -51,7 +53,7 @@ const AddEditProductForm = ({ categoryId, type, mode }) => {
         price: '',
         frequency: 'monthly',
         photos: [],
-        address: 'Hadpsar, Pune',
+        address: '',
         lat: '',
         lng: '',
         user: {
@@ -124,6 +126,12 @@ const AddEditProductForm = ({ categoryId, type, mode }) => {
                             onChange={(photos) => setFieldValue('photos', photos, true)}
                             errors={errors.photos} />
                     </View>
+                    <View>
+                        <FormLocationInput value={values.address} 
+                            onChange={(address) => setFieldValue('address', address, true)}
+                            errors={errors.address}
+                        />
+                    </View>
                     <View style={styles.actions}>
                         <Button style={styles.btn} onPress={handleSubmit} disabled={productCRUD.isLoading}>
                             {productCRUD.isLoading && <ActivityIndicator size="small" color="#fff" style={styles.btnLoader} />}
@@ -155,7 +163,7 @@ const styles = StyleSheet.create({
         marginBottom: 10
     },
     actions: {
-        marginTop: 20,
+        marginTop: 30,
         marginBottom: 25
     },
     btn: {
