@@ -1,5 +1,5 @@
 // Core
-import React, { useCallback, useContext } from 'react';
+import React, { useCallback, useContext, useState, useEffect } from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Icon } from 'native-base';
 import { useNavigation } from '@react-navigation/native';
@@ -20,7 +20,8 @@ const TopLocationBar = () => {
 
   return (
     <View style={styles.container}>
-      <SetLocation value={currentLocation.name}
+      <SetLocation type={'global'}
+        value={currentLocation.name}
         placeholder={'Your Location'}
         onChangeLocation={(value) => dispatch({ payload: { currentLocation: value } })}
         style={styles.setLocationBtn}

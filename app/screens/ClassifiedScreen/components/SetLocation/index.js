@@ -7,7 +7,7 @@ import { Icon } from 'native-base';
 // Components
 import PlacesAutocompleteModal from '../PlacesAutocompleteModal';
 
-const SetLocation = ({ value, placeholder, onChangeLocation, style }) => {
+const SetLocation = ({ type, value, placeholder, onChangeLocation, style }) => {
   const [isModalVisible, setModalVisible] = useState(false);
   return (
     <React.Fragment>
@@ -16,7 +16,8 @@ const SetLocation = ({ value, placeholder, onChangeLocation, style }) => {
         {!value && <Text style={styles.placeholder} numberOfLines={1}>{placeholder}</Text>}
         <Text style={styles.location} numberOfLines={1}>{value}</Text>
       </TouchableOpacity>
-      <PlacesAutocompleteModal visible={isModalVisible}
+      <PlacesAutocompleteModal type={type}
+        visible={isModalVisible}
         onChangeLocation={onChangeLocation}
         onClose={() => setModalVisible(false)}
       />
@@ -59,4 +60,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SetLocation;
+export default React.memo(SetLocation);

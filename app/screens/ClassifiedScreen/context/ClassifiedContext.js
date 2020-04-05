@@ -1,4 +1,6 @@
 import React, { useReducer } from 'react';
+import { of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import reducer from './reducer';
 import { categories } from './categories';
 import apiService from './api.service';
@@ -8,7 +10,10 @@ const initialState = {
   search: '',
   categories: categories,
   places: {
-    isLoading: true,
+    searchTerm: '',
+    isLoading: false,
+    isSelectedLoading: false,
+    globalEntities: [],
     entities: [],
     error: '',
   },
@@ -95,20 +100,27 @@ function ClassifiedProvider(props) {
     });
   };
 
-  const fetchPlaces = (searchTerm) => {
-    requestAnimationFrame(() => {
-      setPlaces({ isLoading: true, error: '' });
-      apiService.fetchPlaces(searchTerm)
-        .then(entities => {
+  const fetchPlaces = (type, searchTerm) => {
+    setPlaces({ isLoading: true, error: '' });
+    return apiService.fetchPlaces(searchTerm).pipe(
+      map((entities) => {
+        if (type === 'global') {
+          console.log('set global ', searchTerm, entities);
+          setPlaces({ globalEntities: entities, isLoading: false, error: '' });
+        } else {
           setPlaces({ entities, isLoading: false, error: '' });
-        })
-        .catch(err => {
-          setPlaces({
-            error: err.toString() || 'Something went wrong, please try again.',
-            isLoading: false,
-          });
+        }
+        return entities;
+      }),
+      catchError((err) => {
+        setPlaces({
+          globalEntities: [],
+          entities: [],
+          error: err.toString() || 'Something went wrong, please try again.',
+          isLoading: false,
         });
-    });
+      })
+    );
   };
 
   const fetchForwardGeocode = (address) => {
@@ -120,19 +132,21 @@ function ClassifiedProvider(props) {
   };
 
   const fetchRecommendations = () => {
-    requestAnimationFrame(() => {
-      setRecommendations({ isLoading: true, error: '' });
-      apiService.fetchRecommendations()
-        .then(entities => {
-          setRecommendations({ entities, isLoading: false, error: '' });
-        })
-        .catch(err => {
-          setRecommendations({
-            error: err.toString() || 'Something went wrong, please try again.',
-            isLoading: false,
-          });
+    setRecommendations({ isLoading: true, error: '' });
+    return apiService.fetchRecommendations().pipe(
+      map((entities) => {
+        console.log(entities);
+        setRecommendations({ entities, isLoading: false, error: '' });
+      }),
+      catchError((err) => {
+        setRecommendations({
+          error: err.toString() || 'Something went wrong, please try again.',
+          entities: [],
+          isLoading: false,
         });
-    });
+        return of(err);
+      })
+    );
   };
 
   const fetchProducts = () => {

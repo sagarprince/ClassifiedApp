@@ -9,7 +9,7 @@ import SetLocation from '../SetLocation';
 const FormLocationInput = ({ value, errors, onChange }) => {
     return (
         <React.Fragment>
-            <SetLocation value={value}
+            <SetLocation type={'form'} value={value}
                 onChangeLocation={(v) => onChange(v)}
                 style={styles.setLocationBtn}
             />

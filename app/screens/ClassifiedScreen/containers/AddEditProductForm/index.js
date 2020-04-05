@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
         marginTop: 15
     },
     productImagesWrap: {
-        marginBottom: 10
+        marginBottom: 16
     },
     productImagesHeading: {
         color: '#39405B',
@@ -174,8 +174,8 @@ const styles = StyleSheet.create({
         marginBottom: 10
     },
     actions: {
-        marginTop: 30,
-        marginBottom: 25
+        marginTop: 20,
+        marginBottom: 40
     },
     btn: {
         width: '100%',

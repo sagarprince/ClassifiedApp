@@ -1,7 +1,7 @@
 // Core
-import React, { useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { StyleSheet, Platform, View, FlatList, ActivityIndicator, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, SafeAreaView, View, FlatList, ActivityIndicator, TouchableOpacity, Alert } from 'react-native';
 import Modal from 'react-native-modal';
 import {
     Container, Header, Body, Left, Right,
@@ -15,18 +15,49 @@ import { ClassifiedContext } from '../../context';
 // Hooks
 import { useFormInput, useDebounce } from '../../hooks';
 
-const PlacesAutocompleteModal = ({ visible, onChangeLocation, onClose }) => {
-    const { value, onChange } = useFormInput('');
-    const debouncedSearchTerm = useDebounce(value, 500);
-    const { places, setPlaces, fetchPlaces } = useContext(ClassifiedContext);
+const PlacesAutocompleteModal = ({ type, visible, onChangeLocation, onClose }) => {
+    const isModalVisible = useRef(true);
+    const { places, setPlaces, fetchPlaces, fetchForwardGeocode, fetchReverseGeocode } = useContext(ClassifiedContext);
+    const [isGPSSearching, setGPSSearching] = useState(false);
+    const { value, onChange: setSearchTerm } = useFormInput(type === 'global' ? places.searchTerm : '');
+    const debouncedSearchTerm = useDebounce(value, 400);
+    const subscription = useRef(null);
+    const forwardGeocodeSubscription = useRef(null);
+
+    const onModalShow = () => {
+        isModalVisible.current = true;
+    }
+
+    const onModalWillShow = () => {
+        console.log('places ', places);
+        if (type === 'global') {
+            setSearchTerm(places.searchTerm);
+        }
+    }
+
+    const onModalHide = () => {
+        isModalVisible.current = false;
+        if (type === 'global') {
+            setPlaces({ searchTerm: value });
+        }
+        onDestroy();
+    }
 
     useEffect(() => {
-        console.log('SEARCH TERM ', debouncedSearchTerm);
-        fetchPlaces(debouncedSearchTerm);
+        onDestroy();
+        if (debouncedSearchTerm !== places.searchTerm && isModalVisible.current) {
+            console.log('SEARCH TERM ', debouncedSearchTerm, places.searchTerm);
+            subscription.current = fetchPlaces(type, debouncedSearchTerm).subscribe();
+        }
     }, [debouncedSearchTerm]);
 
-    const _onChangeLocation = () => {
-        const selected = places.entities.find((p) => p.selected);
+    const onDoneLocation = (currentLocation) => {
+        let selected;
+        if (currentLocation) {
+            selected = currentLocation;
+        } else {
+            selected = getPlaceSelected();
+        }
         if (selected) {
             onChangeLocation && onChangeLocation({
                 name: selected.name,
@@ -37,16 +68,56 @@ const PlacesAutocompleteModal = ({ visible, onChangeLocation, onClose }) => {
         onClose && onClose();
     };
 
-    const onPlaceSelection = (item) => {
-        const entities = places.entities.map((p) => {
-            if (p.id === item.id && !p.selected) {
-                p.selected = true;
+    const getPlaceSelected = () => {
+        if (type === 'global') {
+            return places.globalEntities.find((p) => p.selected);
+        }
+        return places.entities.find((p) => p.selected);
+    }
+
+    const setPlaceSelected = (item, data) => {
+        let entities = [];
+        if (type === 'global') {
+            entities = places.globalEntities;
+        } else {
+            entities = places.entities;
+        }
+        return entities.map((p) => {
+            if (item && p.id === item.id) {
+                p.selected = data ? p.selected : !p.selected;
+                if (data) {
+                    p.lat = data.lat;
+                    p.lng = data.lng;
+                }
             } else {
                 p.selected = false;
             }
             return p;
         });
-        setPlaces({ entities });
+    };
+
+    const onSetPlaceSelection = (item, data) => {
+        const entities = setPlaceSelected(item, data);
+        if (type === 'global') {
+            setPlaces({ globalEntities: entities, isSelectedLoading: false });
+        } else {
+            setPlaces({ entities: entities, isSelectedLoading: false });
+        }
+    };
+
+    const onPlaceSelection = (item) => {
+        if (forwardGeocodeSubscription.current) {
+            forwardGeocodeSubscription.current.unsubscribe();
+        }
+        onSetPlaceSelection(item);
+        const selected = getPlaceSelected();
+        if (selected && selected.lat === '') {
+            setPlaces({ isSelectedLoading: true });
+            forwardGeocodeSubscription.current = fetchForwardGeocode(selected.name).subscribe((data) => {
+                console.log(selected.name, data);
+                onSetPlaceSelection(item, data);
+            });
+        }
     };
 
     const setPlaceItemHightlight = (item) => {
@@ -54,18 +125,40 @@ const PlacesAutocompleteModal = ({ visible, onChangeLocation, onClose }) => {
     };
 
     const isPlaceSelected = () => {
-        return places.entities.find((p) => p.selected) ? true : false;
+        return getPlaceSelected() ? true : false;
     }
 
-    const getCurrentLocation = () => {
+    const getCurrentGeoLocation = () => {
+        setGPSSearching(true);
         Geolocation.getCurrentPosition(
             position => {
-                const initialPosition = JSON.stringify(position);
-                Alert.alert('Success', initialPosition);
+                const coords = [position.coords.latitude, position.coords.longitude];
+                console.log(coords);
+                fetchReverseGeocode(coords).subscribe((address) => {
+                    setGPSSearching(false);
+                    setPlaceSelected();
+                    onDoneLocation({
+                        name: address,
+                        lat: coords[0],
+                        lng: coords[1]
+                    });
+                }, () => {
+                    setGPSSearching(false);
+                    Alert.alert('Error', 'Unable to find current location');
+                });
             },
-            error => Alert.alert('Error', JSON.stringify(error)),
+            (_) => {
+                setGPSSearching(false);
+                Alert.alert('Error', 'Unable to find current location, please check your device gps is enable.')
+            },
             { enableHighAccuracy: false, timeout: 3000, maximumAge: 1000 },
         );
+    }
+
+    const onDestroy = () => {
+        if (subscription.current) {
+            subscription.current.unsubscribe();
+        }
     }
 
     return (
@@ -73,6 +166,9 @@ const PlacesAutocompleteModal = ({ visible, onChangeLocation, onClose }) => {
             useNativeDriver={true}
             hideModalContentWhileAnimating={true}
             onBackButtonPress={() => onClose && onClose()}
+            onModalShow={onModalShow}
+            onModalWillShow={onModalWillShow}
+            onModalHide={onModalHide}
             style={styles.modal}>
             <Container style={styles.container}>
                 <Header style={styles.header}>
@@ -85,30 +181,36 @@ const PlacesAutocompleteModal = ({ visible, onChangeLocation, onClose }) => {
                         <Title style={styles.headerTitle}>Set Location</Title>
                     </Body>
                     <Right>
-                        {isPlaceSelected() && <Button transparent
-                            onPress={_onChangeLocation}
+                        {!places.isSelectedLoading && isPlaceSelected() && <Button transparent
+                            onPress={() => onDoneLocation()}
                             style={styles.backBtn}>
                             <Icon type="MaterialIcons" name="check" style={styles.doneIcon} />
                         </Button>}
+                        {places.isSelectedLoading && <ActivityIndicator size="large" color="#fff" />}
                     </Right>
                 </Header>
                 <View>
                     <Item style={styles.searchBox}>
-                        <Input placeholder="Search..." value={value} onChangeText={onChange} style={styles.searchBoxInput} />
+                        <Input placeholder="Search..." value={value} onChangeText={setSearchTerm} style={styles.searchBoxInput} />
                         {places.isLoading ? <ActivityIndicator size="small" /> : (
-                            value !== '' ? <TouchableOpacity onPress={() => onChange('')}>
+                            value !== '' ? <TouchableOpacity onPress={() => setSearchTerm('')}>
                                 <Icon type="MaterialIcons" name="close" style={styles.clearBtnIcon} />
                             </TouchableOpacity> : <Icon name="search" />
                         )}
                     </Item>
                     <View style={styles.listing}>
                         <FlatList
-                            data={places.entities}
+                            data={type === 'global' ? places.globalEntities : places.entities}
                             ListHeaderComponent={() => {
                                 return (
                                     <View style={styles.currentLocation}>
-                                        <TouchableOpacity style={styles.currentLocationBtn} onPress={getCurrentLocation}>
-                                            <Icon type="Feather" name="crosshair" style={styles.currentLocationIcon} />
+                                        <TouchableOpacity style={styles.currentLocationBtn} onPress={() => {
+                                            if (!isGPSSearching) {
+                                                getCurrentGeoLocation();
+                                            }
+                                        }}>
+                                            {!isGPSSearching && <Icon type="Feather" name="crosshair" style={styles.currentLocationIcon} />}
+                                            {isGPSSearching && <ActivityIndicator style={styles.currentLocationLoading} />}
                                             <Text style={styles.currentLocationBtnText}>Current Location</Text>
                                         </TouchableOpacity>
                                     </View>
@@ -200,6 +302,9 @@ const styles = StyleSheet.create({
         fontSize: 22,
         marginRight: 10
     },
+    currentLocationLoading: {
+        marginRight: 10
+    },
     placeItem: {
         paddingLeft: 15,
         paddingRight: 15,
@@ -221,4 +326,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default PlacesAutocompleteModal;
+export default React.memo(PlacesAutocompleteModal);

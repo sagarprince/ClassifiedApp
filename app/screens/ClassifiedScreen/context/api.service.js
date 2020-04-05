@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { Observable } from 'rxjs';
+import Axios from 'axios-observable';
+import { distinctUntilChanged, map } from 'rxjs/operators';
 import FormData from 'form-data';
 import RNFetchBlob from 'rn-fetch-blob';
 
@@ -12,28 +13,18 @@ const PLACES_AUTOCOMPLETE_API_URL = `https://maps.googleapis.com/maps/api/place/
 const FORWARD_GEOCODE_API_URL = 'https://geocode.xyz?auth=18054595166009333541x5296&geoit=json';
 const REVERSE_GEOCODE_API_URL = 'https://api.opencagedata.com/geocode/v1/json?key=87db9f1a1fc84e869da13608fee0c496&pretty=1&no_annotations=1';
 
-const instance = axios.create({
-  baseURL: API_BASE_URL,
-});
-
 class ApiService {
   fetchRecommendations() {
-    return new Promise((resolve, reject) => {
-      instance
-        .get('/products')
-        .then(response => {
-          setTimeout(() => resolve(response.data), 2000);
-        })
-        .catch(error => {
-          setTimeout(() => reject(error), 2000);
-        });
-    });
+    return Axios
+      .get(`${API_BASE_URL}/products`).pipe(
+        map((response) => response.data)
+      );
   }
 
   saveProduct(product) {
     return new Promise((resolve, reject) => {
-      instance
-        .post('/products', product)
+      axios
+        .post(`${API_BASE_URL}/products`, product)
         .then(response => {
           resolve(response.data);
         })
@@ -67,58 +58,43 @@ class ApiService {
   }
 
   fetchPlaces(searchTerm) {
-    return new Promise((resolve, reject) => {
-      axios
-        .get(`${PLACES_AUTOCOMPLETE_API_URL}&input=${searchTerm}`)
-        .then(response => {
-          const places = response.data.predictions.map((item) => {
-            return {
-              id: item.place_id,
-              name: item.description,
-              selected: false,
-              lat: '',
-              lng: ''
-            };
-          });
-          resolve(places);
-        })
-        .catch(error => {
-          reject(error);
+    return Axios.get(`${PLACES_AUTOCOMPLETE_API_URL}&input=${searchTerm}`).pipe(
+      distinctUntilChanged(),
+      map((response) => {
+        const places = response.data.predictions.map((item) => {
+          return {
+            id: item.place_id,
+            name: item.description,
+            selected: false,
+            lat: '',
+            lng: ''
+          };
         });
-    }); 
+        return places;
+      })
+    );
   }
 
   fetchForwardGeocode(address) {
-    return new Promise((resolve, reject) => {
-      axios
-        .get(`${FORWARD_GEOCODE_API_URL}&locate=${address}`)
-        .then(response => {
-          const data = response.data;
-          const location = {
-            lat: data.latt,
-            lng: data.longt
-          };
-          resolve(location);
-        })
-        .catch(error => {
-          reject(error);
-        });
-    });
+    return Axios.get(`${FORWARD_GEOCODE_API_URL}&locate=${address}`).pipe(
+      map((response) => {
+        const data = response.data;
+        const location = {
+          lat: data.latt,
+          lng: data.longt
+        };
+        return location;
+      })
+    );
   }
 
   fetchReverseGeocode(location) {
-    return new Promise((resolve, reject) => {
-      axios
-        .get(`${REVERSE_GEOCODE_API_URL}&q=${location.join(',')}`)
-        .then(response => {
-          const data = response.data;
-          const address = data.results.length > 0 ? results[0].formatted : '';
-          resolve(address);
-        })
-        .catch(error => {
-          reject(error);
-        });
-    });
+    return Axios.get(`${REVERSE_GEOCODE_API_URL}&q=${location.join(',')}`).pipe(
+      map((response) => {
+        const data = response.data;
+        return data.results.length > 0 ? data.results[0].formatted : '';
+      })
+    );
   }
 }
 

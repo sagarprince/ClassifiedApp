@@ -1,5 +1,5 @@
 // Core
-import React, { useEffect, useCallback, useContext } from 'react';
+import React, { useEffect, useCallback, useContext, useRef } from 'react';
 import {
   StyleSheet,
   View,
@@ -20,6 +20,24 @@ import ProductCard from '../../components/ProductCard';
 const MyRecommendations = () => {
   const { recommendations, fetchRecommendations } = useContext(ClassifiedContext);
   const navigation = useNavigation();
+  const subscription = useRef(null);
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      subscription.current = fetchRecommendations().subscribe(() => { });
+    });
+    return () => {
+      onDestroy();
+      cancelAnimationFrame(frame);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const onDestroy = () => {
+    if (subscription.current) {
+      subscription.current.unsubscribe();
+    };
+  };
 
   const onPress = useCallback(
     id => {
@@ -28,19 +46,11 @@ const MyRecommendations = () => {
     [navigation],
   );
 
-  useEffect(() => {
-    const frame = requestAnimationFrame(() => {
-      fetchRecommendations();
-    });
-    return () => cancelAnimationFrame(frame);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerText}>My Recommendations</Text>
-        <TouchableOpacity onPress={() => fetchRecommendations()}>
+        <TouchableOpacity onPress={() => fetchRecommendations().subscribe()}>
           {!recommendations.isLoading && recommendations.entities.length > 0 &&
             <Icon type="Feather" name="refresh-cw" style={styles.refreshBtnIcon} ></Icon>}
           {recommendations.isLoading && recommendations.entities.length > 0 &&
