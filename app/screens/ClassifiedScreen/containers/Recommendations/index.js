@@ -1,22 +1,24 @@
 // Core
-import React, {useEffect, useCallback, useContext} from 'react';
+import React, { useEffect, useCallback, useContext } from 'react';
 import {
   StyleSheet,
   View,
   Text,
   FlatList,
   ActivityIndicator,
+  TouchableOpacity,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import { Icon } from 'native-base';
+import { useNavigation } from '@react-navigation/native';
 
 // Context
-import {ClassifiedContext} from '../../context';
+import { ClassifiedContext } from '../../context';
 
 // Components
 import ProductCard from '../../components/ProductCard';
 
 const MyRecommendations = () => {
-  const {recommendations, fetchRecommendations} = useContext(ClassifiedContext);
+  const { recommendations, fetchRecommendations } = useContext(ClassifiedContext);
   const navigation = useNavigation();
 
   const onPress = useCallback(
@@ -36,8 +38,16 @@ const MyRecommendations = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>My Recommendations</Text>
-      {recommendations.isLoading && (
+      <View style={styles.header}>
+        <Text style={styles.headerText}>My Recommendations</Text>
+        <TouchableOpacity onPress={() => fetchRecommendations()}>
+          {!recommendations.isLoading && recommendations.entities.length > 0 &&
+            <Icon type="Feather" name="refresh-cw" style={styles.refreshBtnIcon} ></Icon>}
+          {recommendations.isLoading && recommendations.entities.length > 0 &&
+            <ActivityIndicator color="#8EBF37" />}
+        </TouchableOpacity>
+      </View>
+      {recommendations.isLoading && recommendations.entities.length === 0 && (
         <ActivityIndicator size="large" color="#8EBF37" style={styles.loader} />
       )}
       {recommendations.error !== '' && (
@@ -52,7 +62,7 @@ const MyRecommendations = () => {
         horizontal={true}
         showsHorizontalScrollIndicator={false}
         data={recommendations.entities}
-        renderItem={({item}) => (
+        renderItem={({ item }) => (
           <ProductCard product={item} onPress={onPress} />
         )}
         keyExtractor={item => item.id.toString()}
@@ -66,13 +76,22 @@ const styles = StyleSheet.create({
     marginTop: 25,
   },
   header: {
-    color: '#39405B',
-    marginLeft: 3,
-    fontSize: 18,
-    fontWeight: '500',
     marginTop: 5,
     marginBottom: 25,
-    paddingHorizontal: 15,
+    paddingLeft: 18,
+    paddingRight: 18,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  headerText: {
+    color: '#39405B',
+    fontSize: 18,
+    fontWeight: '500',
+  },
+  refreshBtnIcon: {
+    color: '#39405B',
+    fontSize: 20,
   },
   loader: {
     marginTop: 35,

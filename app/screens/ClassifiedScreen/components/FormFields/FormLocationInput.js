@@ -1,29 +1,20 @@
 // Core
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
-import { Icon } from 'native-base';
+import { StyleSheet, View, Text } from 'react-native';
 
 // Components
-import PlacesAutocompleteModal from '../PlacesAutocompleteModal';
+import SetLocation from '../SetLocation';
 
-const FormLocationInput = (props) => {
-    const { value, errors, onChange } = props;
-    const [isModalVisible, setModalVisible] = useState(false);
-
+const FormLocationInput = ({ value, errors, onChange }) => {
     return (
-        <View>
-            <TouchableOpacity style={styles.btn} onPress={() => setModalVisible(true)}>
-                <Icon type="Entypo" name="location-pin" style={styles.icon} />
-                {!value && <Text style={styles.placeholder} numberOfLines={1}>Set Location</Text>}
-                <Text style={styles.location} numberOfLines={1}>{value}</Text>
-            </TouchableOpacity>
-            <Text style={styles.error}>{errors}</Text>
-            <PlacesAutocompleteModal visible={isModalVisible}
-                onChangeLocation={(value) => onChange(value.name)}
-                onClose={() => setModalVisible(false)}
+        <React.Fragment>
+            <SetLocation value={value}
+                onChangeLocation={(v) => onChange(v)}
+                style={styles.setLocationBtn}
             />
-        </View>
+            <Text style={styles.error}>{errors}</Text>
+        </React.Fragment>
     );
 };
 
@@ -38,28 +29,14 @@ FormLocationInput.propTypes = {
 };
 
 const styles = StyleSheet.create({
-    btn: {
+    setLocationBtn: {
+        flexDirection: 'row',
+        alignItems: 'center',
         borderWidth: 1,
         borderColor: '#bcbcbc',
-        height: 62,
-        paddingHorizontal: 15,
-        flexDirection: 'row',
-        alignItems: 'center'
-    },
-    icon: {
-        fontSize: 24,
-        color: '#8FBF38'
-    },
-    placeholder: {
-        marginLeft: 5,
-        fontSize: 16,
-        color: '#bcbcbc'
-    },
-    location: {
-        marginLeft: 5,
-        paddingRight: 15,
-        fontSize: 16,
-        color: '#444',
+        height: 60,
+        paddingLeft: 15,
+        paddingRight: 30,
     },
     error: {
         marginTop: 5,

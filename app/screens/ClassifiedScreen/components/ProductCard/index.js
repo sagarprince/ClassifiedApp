@@ -28,7 +28,7 @@ const ProductCard = ({ product, onPress, style }) => {
         </View>
         <View style={styles.row}>
           <Icon type="FontAwesome" name="map-marker" style={styles.icon} />
-          <Text style={styles.address} numberOfLines={1}>{product.address}</Text>
+          <Text style={styles.address} numberOfLines={1}>{product.location.name}</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     padding: 0,
     width: 200,
     height: 250,
-    marginHorizontal: 20,
+    marginHorizontal: 15,
     marginBottom: 20,
     backgroundColor: '#FFF',
     borderRadius: 10,

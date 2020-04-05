@@ -1,11 +1,12 @@
 import axios from 'axios';
+import { Observable } from 'rxjs';
 import FormData from 'form-data';
 import RNFetchBlob from 'rn-fetch-blob';
 
 const GCLOUD_API_KEY = 'AIzaSyDKyMtjiMM-BNDn9gE_jmYj5tUi6alUAwA';
 
 const API_BASE_URL = 'https://classifiedserver.herokuapp.com';
-// const API_BASE_URL = 'http://192.168.0.102:3004';
+// const API_BASE_URL = 'http://localhost:3004';
 const IMAGE_UPLOAD_URL = 'https://api.imgbb.com/1/upload?key=df3d504031d2907f76602f3400519ea1';
 const PLACES_AUTOCOMPLETE_API_URL = `https://maps.googleapis.com/maps/api/place/autocomplete/json?key=${GCLOUD_API_KEY}&sessiontoken=383483242`;
 const FORWARD_GEOCODE_API_URL = 'https://geocode.xyz?auth=18054595166009333541x5296&geoit=json';
@@ -74,7 +75,9 @@ class ApiService {
             return {
               id: item.place_id,
               name: item.description,
-              selected: false
+              selected: false,
+              lat: '',
+              lng: ''
             };
           });
           resolve(places);
@@ -82,7 +85,7 @@ class ApiService {
         .catch(error => {
           reject(error);
         });
-    });
+    }); 
   }
 
   fetchForwardGeocode(address) {

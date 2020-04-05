@@ -28,7 +28,11 @@ const PlacesAutocompleteModal = ({ visible, onChangeLocation, onClose }) => {
     const _onChangeLocation = () => {
         const selected = places.entities.find((p) => p.selected);
         if (selected) {
-            onChangeLocation && onChangeLocation(selected);
+            onChangeLocation && onChangeLocation({
+                name: selected.name,
+                lat: selected.lat,
+                lng: selected.lng
+            });
         }
         onClose && onClose();
     };

@@ -4,7 +4,7 @@ import { categories } from './categories';
 import apiService from './api.service';
 
 const initialState = {
-  currentLocation: '',
+  currentLocation: {},
   search: '',
   categories: categories,
   places: {

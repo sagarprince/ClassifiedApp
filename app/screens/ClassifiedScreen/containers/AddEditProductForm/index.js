@@ -1,5 +1,5 @@
 // Core
-import React, { useContext, useCallback } from 'react';
+import React, { useContext, useCallback, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { StyleSheet, View, Text, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -15,7 +15,7 @@ import { FormInput, FormSelect, FormImagesInput, FormLocationInput } from '../..
 
 const AddEditProductForm = ({ categoryId, type, mode }) => {
     const navigation = useNavigation();
-    const { productCRUD, saveProduct } = useContext(ClassifiedContext);
+    const { productCRUD, saveProduct, setPlaces } = useContext(ClassifiedContext);
 
     const validationSchema = Yup.object().shape({
         title: Yup.string()
@@ -36,8 +36,12 @@ const AddEditProductForm = ({ categoryId, type, mode }) => {
         frequency: Yup.string()
             .required('This is a required field.'),
         photos: Yup.array().required('Please upload product images.'),
-        address: Yup.string()
-            .required('Please select a location.'),
+        location: Yup.mixed()
+            .test(
+                'required',
+                'Please select a location.',
+                value => value.name,
+            ),
     });
 
     const frequencyOptions = [
@@ -53,9 +57,11 @@ const AddEditProductForm = ({ categoryId, type, mode }) => {
         price: '',
         frequency: 'monthly',
         photos: [],
-        address: '',
-        lat: '',
-        lng: '',
+        location: {
+            name: '',
+            lat: '',
+            lng: ''
+        },
         user: {
             id: 1,
             name: 'Sagar Pansare'
@@ -79,6 +85,11 @@ const AddEditProductForm = ({ categoryId, type, mode }) => {
             showToast(err.toString(), 'danger');
         });
     }, [saveProduct]);
+
+    useEffect(() => {
+        return () => setPlaces({ entities: [] });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
         <Formik
@@ -127,9 +138,9 @@ const AddEditProductForm = ({ categoryId, type, mode }) => {
                             errors={errors.photos} />
                     </View>
                     <View>
-                        <FormLocationInput value={values.address} 
-                            onChange={(address) => setFieldValue('address', address, true)}
-                            errors={errors.address}
+                        <FormLocationInput value={values.location.name}
+                            onChange={(location) => setFieldValue('location', location, true)}
+                            errors={errors.location}
                         />
                     </View>
                     <View style={styles.actions}>
@@ -154,7 +165,7 @@ const styles = StyleSheet.create({
         marginTop: 15
     },
     productImagesWrap: {
-        marginBottom: 20
+        marginBottom: 10
     },
     productImagesHeading: {
         color: '#39405B',
