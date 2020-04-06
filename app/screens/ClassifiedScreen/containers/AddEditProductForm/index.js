@@ -21,7 +21,7 @@ import {
   FormLocationInput,
 } from '../../components/FormFields';
 
-const AddEditProductForm = ({categoryId, type, mode}) => {
+const AddEditProductForm = ({categoryId, productInfo, type, mode}) => {
   const navigation = useNavigation();
   const {productCRUD, saveProduct, setPlaces} = useContext(ClassifiedContext);
 
@@ -44,7 +44,9 @@ const AddEditProductForm = ({categoryId, type, mode}) => {
     ),
   });
 
-  const formState = {
+  productInfo.price = productInfo.price.toString();
+
+  let formState = {
     categoryId: categoryId,
     title: '',
     description: '',
@@ -61,6 +63,7 @@ const AddEditProductForm = ({categoryId, type, mode}) => {
       name: 'Sagar Pansare',
     },
     type: type,
+    ...productInfo
   };
 
   const showToast = (text, toastType) => {
@@ -69,7 +72,7 @@ const AddEditProductForm = ({categoryId, type, mode}) => {
 
   const onSave = useCallback(
     product => {
-      saveProduct(product)
+      saveProduct(mode, product)
         .then(_ => {
           let text = 'Product updated successfully.';
           if (mode === 'add') {
@@ -103,7 +106,6 @@ const AddEditProductForm = ({categoryId, type, mode}) => {
         values,
         errors,
         setFieldValue,
-        setFieldError,
       }) => (
         <View>
           <View>
@@ -191,8 +193,13 @@ const AddEditProductForm = ({categoryId, type, mode}) => {
   );
 };
 
+AddEditProductForm.defaultProps = {
+  productInfo: {},
+};
+
 AddEditProductForm.propTypes = {
   categoryId: PropTypes.number.isRequired,
+  productInfo: PropTypes.any,
 };
 
 const styles = StyleSheet.create({

@@ -30,7 +30,7 @@ function ClassifiedProvider(props) {
         },
       });
     }
-  };
+  }
 
   const setRecommendations = payload => {
     dispatch({
@@ -41,7 +41,7 @@ function ClassifiedProvider(props) {
         },
       },
     });
-  };
+  }
 
   const setProducts = payload => {
     dispatch({
@@ -52,7 +52,7 @@ function ClassifiedProvider(props) {
         },
       },
     });
-  };
+  }
 
   const setProductCRUD = payload => {
     dispatch({
@@ -63,7 +63,7 @@ function ClassifiedProvider(props) {
         },
       },
     });
-  };
+  }
 
   const setAlerts = payload => {
     dispatch({
@@ -74,7 +74,7 @@ function ClassifiedProvider(props) {
         },
       },
     });
-  };
+  }
 
   const fetchPlaces = (type, searchTerm) => {
     setPlaces(type, {isLoading: true, error: ''});
@@ -93,15 +93,15 @@ function ClassifiedProvider(props) {
         return of(err);
       }),
     );
-  };
+  }
 
   const fetchForwardGeocode = address => {
     return apiService.fetchForwardGeocode(address);
-  };
+  }
 
   const fetchReverseGeocode = location => {
     return apiService.fetchReverseGeocode(location);
-  };
+  }
 
   const fetchRecommendations = () => {
     setRecommendations({isLoading: true, error: ''});
@@ -119,60 +119,98 @@ function ClassifiedProvider(props) {
         return of(err);
       }),
     );
-  };
+  }
 
-  const fetchProducts = () => {
-    requestAnimationFrame(() => {
-      setProducts({entities: []});
-    });
-  };
+  const fetchProducts = (params = {}) => {
+    setProducts({isLoading: true, error: ''});
+    return apiService.fetchProducts(params).pipe(
+      map(entities => {
+        setProducts({entities, isLoading: false, error: ''});
+      }),
+      catchError(err => {
+        setProducts({
+          error: err.toString() || 'Something went wrong, please try again.',
+          entities: [],
+          isLoading: false,
+        });
+        return of(err);
+      }),
+    );
+  }
 
   const fetchAlerts = () => {
     requestAnimationFrame(() => {
       setAlerts({entities: []});
     });
-  };
+  }
 
-  const saveProduct = product => {
+  const saveProductInfo = (mode, product, resolve, reject) => {
+    apiService
+      .saveProduct(mode, product)
+      .then(data => {
+        const entities = [...state.products.entities];
+        const index = entities.findIndex((item => item.id === product.id));
+        entities[index] = product;
+        setProducts({entities});
+        resolve(data);
+      })
+      .catch(err => {
+        reject(err);
+      })
+      .finally(() => {
+        setProductCRUD({isLoading: false});
+      });
+  }
+
+  const saveProduct = (mode, product) => {
     return new Promise((resolve, reject) => {
       requestAnimationFrame(() => {
-        const promises = [];
         setProductCRUD({isLoading: true});
-        product.photos.forEach(photo => {
-          promises.push(apiService.saveProductImage(photo.uri));
-        });
-
-        Promise.all(promises)
-          .then(results => {
-            const photos = results.map(result => {
-              const photo = result.data;
-              return {
-                id: photo.id,
-                thumbUrl: photo.thumb.url,
-                url: photo.url,
-                uploaded: true,
-              };
-            });
-            product.photos = photos;
-            apiService
-              .saveProduct(product)
-              .then(data => {
-                resolve(data);
-              })
-              .catch(err => {
-                reject(err);
-              })
-              .finally(() => {
-                setProductCRUD({isLoading: false});
-              });
-          })
-          .catch(() => {
-            reject('Something went wrong, please try again.');
-            setProductCRUD({isLoading: false});
+        const newPhotos = product.photos.filter((p) => !p.uploded);
+        if (newPhotos.length > 0) {
+          const promises = [];
+          product.photos.forEach(photo => {
+            promises.push(apiService.saveProductImage(photo.uri));
           });
+
+          Promise.all(promises)
+            .then(results => {
+              const photos = results.map(result => {
+                const photo = result.data;
+                return {
+                  id: photo.id,
+                  thumbUrl: photo.thumb.url,
+                  url: photo.url,
+                  uploaded: true,
+                };
+              });
+              product.photos = photos;
+              saveProductInfo(mode, product, resolve, reject);
+            })
+            .catch(() => {
+              reject('Something went wrong, please try again.');
+              setProductCRUD({isLoading: false});
+            });
+        } else {
+          saveProductInfo(mode, product, resolve, reject);
+        }
       });
     });
-  };
+  }
+
+  const deleteProduct = (product) => {
+    return apiService
+    .delete(product)
+    .then(data => {
+      resolve(data);
+    })
+    .catch(err => {
+      reject(err);
+    })
+    .finally(() => {
+      setProductCRUD({isLoading: false});
+    });
+  }
 
   const providerValue = {
     ...state,
@@ -181,10 +219,12 @@ function ClassifiedProvider(props) {
     fetchPlaces,
     fetchForwardGeocode,
     fetchReverseGeocode,
+    setProducts,
     fetchRecommendations,
     fetchProducts,
     fetchAlerts,
     saveProduct,
+    deleteProduct,
   };
 
   return (

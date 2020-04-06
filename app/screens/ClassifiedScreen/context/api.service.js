@@ -17,55 +17,6 @@ const REVERSE_GEOCODE_API_URL =
   'https://api.opencagedata.com/geocode/v1/json?key=87db9f1a1fc84e869da13608fee0c496&pretty=1&no_annotations=1';
 
 class ApiService {
-  fetchRecommendations() {
-    return Axios.get(`${API_BASE_URL}/products`).pipe(
-      delay(1500),
-      map(response => response.data),
-    );
-  }
-
-  saveProduct(product) {
-    return new Promise((resolve, reject) => {
-      axios
-        .post(`${API_BASE_URL}/products`, product)
-        .then(response => {
-          resolve(response.data);
-        })
-        .catch(error => {
-          reject(error);
-        });
-    });
-  }
-
-  saveProductImage(imageUri) {
-    return new Promise((resolve, reject) => {
-      RNFetchBlob.fs
-        .readFile(imageUri.replace('file://', ''), 'base64')
-        .then(data => {
-          requestAnimationFrame(() => {
-            const formData = new FormData();
-            formData.append('image', data);
-            axios
-              .post(IMAGE_UPLOAD_URL, formData, {
-                headers: {
-                  Accept: 'application/json',
-                  'Content-Type': 'multipart/form-data',
-                },
-              })
-              .then(response => {
-                resolve(response.data);
-              })
-              .catch(err => {
-                reject(err);
-              });
-          });
-        })
-        .catch(() => {
-          reject('Something went wrong, please try again.');
-        });
-    });
-  }
-
   fetchPlaces(searchTerm) {
     return Axios.get(`${PLACES_AUTOCOMPLETE_API_URL}&input=${searchTerm}`).pipe(
       distinctUntilChanged(),
@@ -104,6 +55,81 @@ class ApiService {
         return data.results.length > 0 ? data.results[0].formatted : '';
       }),
     );
+  }
+
+  fetchRecommendations() {
+    return Axios.get(`${API_BASE_URL}/products`).pipe(
+      delay(1500),
+      map(response => response.data),
+    );
+  }
+
+  fetchProducts(params = {}) {
+    const queryParams = Object.keys(params).map(key => key + '=' + params[key]).join('&');
+    return Axios.get(`${API_BASE_URL}/products?${queryParams}`).pipe(
+      delay(1500),
+      map(response => response.data),
+    );
+  }
+
+  saveProduct(mode, product) {
+    return new Promise((resolve, reject) => {
+      const url = mode === 'edit' ? 
+        `${API_BASE_URL}/products/${product.id}` : 
+        `${API_BASE_URL}/products`; 
+      axios({
+        url,
+        method: mode === 'edit' ? 'PUT' : 'POST',
+        data: product
+      })
+        .then(response => {
+          resolve(response.data);
+        })
+        .catch(error => {
+          reject(error);
+        });
+    });
+  }
+
+  saveProductImage(imageUri) {
+    return new Promise((resolve, reject) => {
+      RNFetchBlob.fs
+        .readFile(imageUri.replace('file://', ''), 'base64')
+        .then(data => {
+          requestAnimationFrame(() => {
+            const formData = new FormData();
+            formData.append('image', data);
+            axios
+              .post(IMAGE_UPLOAD_URL, formData, {
+                headers: {
+                  Accept: 'application/json',
+                  'Content-Type': 'multipart/form-data',
+                },
+              })
+              .then(response => {
+                resolve(response.data);
+              })
+              .catch(err => {
+                reject(err);
+              });
+          });
+        })
+        .catch(() => {
+          reject('Something went wrong, please try again.');
+        });
+    });
+  }
+
+  deleteProduct(product) {
+    return new Promise((resolve, reject) => {
+      axios.delete(`${API_BASE_URL}/products/${product.id}`)
+        .then(response => {
+          resolve(response.data);
+        })
+        .catch(error => {
+          reject(error);
+        });
+    });
   }
 }
 const apiService = new ApiService();

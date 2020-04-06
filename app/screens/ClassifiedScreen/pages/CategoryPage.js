@@ -70,6 +70,12 @@ export default function CategoryPage() {
             <Text style={styles.buttonText}>I want to give on Rent</Text>
             <Icon type="Entypo" name="chevron-thin-right" style={styles.icon} />
           </Button>
+          <Button
+            style={styles.button}
+            onPress={() => navigation.navigate('MyProducts', {id})}>
+            <Text style={styles.buttonText}>My Products</Text>
+            <Icon type="Entypo" name="chevron-thin-right" style={styles.icon} />
+          </Button>
         </View>
       </ContentView>
     </Container>

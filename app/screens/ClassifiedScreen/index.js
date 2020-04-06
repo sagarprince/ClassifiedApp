@@ -11,6 +11,7 @@ import {ClassifiedProvider} from './context';
 import HomePage from './pages/HomePage';
 import CategoryPage from './pages/CategoryPage';
 import ProductsPage from './pages/ProductsPage';
+import MyProductsPage from './pages/MyProductsPage';
 import AddEditProductPage from './pages/AddEditProductPage';
 import AlertsPage from './pages/AlertsPage';
 
@@ -34,6 +35,11 @@ const ClassifiedScreen = () => {
         <Stack.Screen
           name="Products"
           component={ProductsPage}
+          initialParams={{isHome: false}}
+        />
+        <Stack.Screen
+          name="MyProducts"
+          component={MyProductsPage}
           initialParams={{isHome: false}}
         />
         <Stack.Screen

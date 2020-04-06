@@ -9,33 +9,29 @@ import {useParentNavigation, useCategory} from '../hooks';
 
 // Components
 import ContentView from '../components/ContentView';
-import AddEditProductForm from '../containers/AddEditProductForm';
+import UserLocationBox from '../containers/UserLocationBox';
+import MyProductsListing from '../containers/MyProductsListing';
 
-export default function AddEditProductPage() {
+export default function MyProductsPage() {
   useParentNavigation();
   const route = useRoute();
-  const {id, productInfo, type, mode} = route.params;
+  const {id} = route.params;
   const category = useCategory(id);
   const categoryName = (category && category.name) || '';
   return (
     <Container style={styles.container}>
+      <UserLocationBox />
       <ContentView style={styles.padding}>
         <View style={styles.heading}>
-          <Text style={styles.headingText}>{categoryName}</Text>
+        <Text style={styles.headingText}>My Products</Text>
           <Icon
             type="Entypo"
             name="chevron-small-right"
             style={styles.headingIcon}
           />
-          <Text style={styles.headingText}>
-            {type === 'sell' ? 'Sell' : 'Rent'}
-          </Text>
+            <Text style={styles.headingText}>{categoryName}</Text>
         </View>
-        <AddEditProductForm 
-          categoryId={id}  
-          productInfo={productInfo}
-          type={type} 
-          mode={mode} />
+        <MyProductsListing categoryId={id} />
       </ContentView>
     </Container>
   );
@@ -46,13 +42,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   padding: {
-    paddingVertical: 15,
+    paddingTop: 5,
     paddingHorizontal: 15,
   },
   heading: {
     paddingHorizontal: 20,
-    paddingVertical: 2,
-    marginBottom: 30,
+    paddingVertical: 3,
+    marginBottom: 20,
     borderLeftWidth: 5,
     borderColor: '#39405B',
     backgroundColor: '#f0f0f0',
@@ -60,11 +56,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headingIcon: {
-    marginTop: 2,
+    marginTop: 4,
   },
   headingText: {
     color: '#39405B',
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '500',
   },
 });

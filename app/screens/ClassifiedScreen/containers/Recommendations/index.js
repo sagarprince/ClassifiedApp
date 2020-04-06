@@ -78,7 +78,9 @@ const MyRecommendations = () => {
         showsHorizontalScrollIndicator={false}
         data={recommendations.entities}
         renderItem={({item}) => (
-          <ProductCard product={item} onPress={onPress} />
+          <View style={styles.productCol}>
+            <ProductCard product={item} onPress={onPress} showType={true} />
+          </View>
         )}
         keyExtractor={item => item.id.toString()}
       />
@@ -111,6 +113,11 @@ const styles = StyleSheet.create({
   loader: {
     marginTop: 35,
     marginBottom: 35,
+  },
+  productCol: {
+    width: 200,
+    paddingHorizontal: 10,
+    paddingBottom: 25,
   },
   error: {
     textAlign: 'center',

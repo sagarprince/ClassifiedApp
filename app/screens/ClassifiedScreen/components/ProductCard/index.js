@@ -34,7 +34,7 @@ const ProductCard = ({product, onPress, showType, style}) => {
           <View style={styles.row}>
             <Icon type="FontAwesome" name="inr" style={styles.icon} />
             <Text style={styles.price}>{product.price}</Text>
-            {product.type === 'rent' && frequency && <Text style={styles.frequency}>({frequency.label})</Text>}
+            {product.type === 'rent' && frequency && <Text numberOfLines={1} style={styles.frequency}>({frequency.label})</Text>}
           </View>
           <View style={styles.row}>
             <Icon type="FontAwesome" name="map-marker" style={styles.icon} />
@@ -61,10 +61,8 @@ ProductCard.propTypes = {
 const styles = StyleSheet.create({
   block: {
     padding: 0,
-    width: 200,
-    height: 250,
-    marginHorizontal: 15,
-    marginBottom: 20,
+    width: '100%',
+    height: 230,
     backgroundColor: '#FFF',
     borderRadius: 10,
     elevation: 4,
@@ -92,7 +90,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -45,
     left: -45,
-    backgroundColor: '#8EBF37',
+    backgroundColor: '#0EBF37',
     color: '#fff',
     width: 100,
     height: 70,
@@ -106,7 +104,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: 140,
+    height: 120,
   },
   info: {
     paddingHorizontal: 15,
@@ -132,19 +130,19 @@ const styles = StyleSheet.create({
     marginTop: 10,
     color: '#39405B',
     fontWeight: '500',
-    fontSize: 15,
+    fontSize: 14,
   },
   frequency: {
     color: '#39405B',
-    fontSize: 14,
-    marginLeft: 5,
+    fontSize: 12,
+    marginLeft: 3,
     marginTop: 10
   },
   address: {
     marginTop: 10,
     color: '#39405B',
     fontWeight: '400',
-    fontSize: 15,
+    fontSize: 14,
     paddingRight: 10,
   },
 });
