@@ -111,8 +111,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   loader: {
-    marginTop: 35,
-    marginBottom: 35,
+    marginTop: 20,
+    marginBottom: 50,
   },
   productCol: {
     width: 200,

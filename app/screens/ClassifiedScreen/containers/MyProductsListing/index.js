@@ -23,7 +23,7 @@ const MyProductsListing = ({categoryId}) => {
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
       subscription.current = fetchProducts({
-          categoryId
+        categoryId,
       }).subscribe(() => {});
     });
     return () => {
@@ -34,12 +34,12 @@ const MyProductsListing = ({categoryId}) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const onPress = useCallback((productInfo) => {
+  const onPress = useCallback(productInfo => {
     navigation.navigate('AddEditProduct', {
-        id: categoryId,
-        productInfo,
-        type: 'sell',
-        mode: 'edit',
+      id: categoryId,
+      productInfo,
+      type: 'sell',
+      mode: 'edit',
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -52,62 +52,65 @@ const MyProductsListing = ({categoryId}) => {
 
   const getColWidth = () => {
     if (dimensions.window.width > 600) {
-        return {width: '33%'};
+      return {width: '33%'};
     } else if (dimensions.window.width > 300 && dimensions.window.width < 420) {
-        return {width: '50%'};
+      return {width: '50%'};
     }
     return {width: '100%'};
   };
 
   return (
     <View style={styles.container}>
-        {products.isLoading && products.entities.length === 0 && (
-            <ActivityIndicator size="large" color="#8EBF37" style={styles.loader} />
-        )}
-        {products.error !== '' && (
-            <Text style={styles.error}>{products.error}</Text>
-        )}
-        {!products.isLoading &&
+      {products.isLoading && products.entities.length === 0 && (
+        <ActivityIndicator size="large" color="#8EBF37" style={styles.loader} />
+      )}
+      {products.error !== '' && (
+        <Text style={styles.error}>{products.error}</Text>
+      )}
+      {!products.isLoading &&
         products.error === '' &&
         products.entities.length === 0 && (
-            <View style={styles.noResults}>
-                <Text>No Products Listed.</Text>
-            </View>
+          <View style={styles.noResults}>
+            <Text>No Products Listed.</Text>
+          </View>
         )}
-        <Grid style={styles.grid}>
-            {products.entities.map((product) => {
-                return (
-                    <Col key={product.id} style={[styles.productCol, getColWidth()]}>
-                        <ProductCard product={product} showType={true} 
-                            onPress={() => onPress(product)}
-                        />
-                    </Col>
-                );
-            })}
-        </Grid>
+      <Grid style={styles.grid}>
+        {products.entities.map(product => {
+          return (
+            <Col key={product.id} style={[styles.productCol, getColWidth()]}>
+              <ProductCard
+                product={product}
+                showType={true}
+                onPress={() => onPress(product)}
+              />
+            </Col>
+          );
+        })}
+      </Grid>
     </View>
   );
 };
 
 MyProductsListing.propTypes = {
-    categoryId: PropTypes.number.isRequired,
+  categoryId: PropTypes.number.isRequired,
 };
 
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
+    paddingBottom: 30,
   },
   grid: {
-    flexWrap: 'wrap', 
-    marginHorizontal: '-2%'
+    flexWrap: 'wrap',
+    marginHorizontal: '-2%',
   },
   loader: {
     marginTop: 35,
     marginBottom: 35,
   },
   productCol: {
-      paddingHorizontal: 5,
-      paddingBottom: 10
+    paddingHorizontal: 7,
+    paddingBottom: 16,
   },
   error: {
     textAlign: 'center',

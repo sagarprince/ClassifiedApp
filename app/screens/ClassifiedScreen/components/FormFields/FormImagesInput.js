@@ -58,19 +58,25 @@ const FormImagesInput = props => {
               uri: uri,
             };
             const allImages = [...imgs, selectedImage];
-            const newAddedImages = allImages.filter(x => !x.uploded);
-            onChanges(newAddedImages);
+            console.log(allImages);
+            // const newAddedImages = allImages.filter(x => x.uploded === false);
+            onChanges(allImages);
             return allImages;
           });
       }
     });
-  }, [onChanges, showToast]);
+  }, [onChanges]);
 
   const removeImage = useCallback(
-    id => {
+    image => {
+      if (!image.uploaded) {
+      } else {
+        // confirmation here
+        console.log('CONFIRMATION ', image);
+      }
       setImages(imgs => {
         imgs = imgs.filter(item => {
-          return item.id !== id;
+          return item.id !== image.id;
         });
         onChanges(imgs);
         return imgs;
@@ -92,7 +98,7 @@ const FormImagesInput = props => {
               />
               <TouchableOpacity
                 style={styles.removeImageBtn}
-                onPress={() => removeImage(item.id)}>
+                onPress={() => removeImage(item)}>
                 <Icon
                   type="Entypo"
                   name="cross"

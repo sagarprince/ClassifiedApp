@@ -65,7 +65,9 @@ class ApiService {
   }
 
   fetchProducts(params = {}) {
-    const queryParams = Object.keys(params).map(key => key + '=' + params[key]).join('&');
+    const queryParams = Object.keys(params)
+      .map(key => key + '=' + params[key])
+      .join('&');
     return Axios.get(`${API_BASE_URL}/products?${queryParams}`).pipe(
       delay(1500),
       map(response => response.data),
@@ -74,13 +76,14 @@ class ApiService {
 
   saveProduct(mode, product) {
     return new Promise((resolve, reject) => {
-      const url = mode === 'edit' ? 
-        `${API_BASE_URL}/products/${product.id}` : 
-        `${API_BASE_URL}/products`; 
+      const url =
+        mode === 'edit'
+          ? `${API_BASE_URL}/products/${product.id}`
+          : `${API_BASE_URL}/products`;
       axios({
         url,
         method: mode === 'edit' ? 'PUT' : 'POST',
-        data: product
+        data: product,
       })
         .then(response => {
           resolve(response.data);
@@ -122,7 +125,8 @@ class ApiService {
 
   deleteProduct(product) {
     return new Promise((resolve, reject) => {
-      axios.delete(`${API_BASE_URL}/products/${product.id}`)
+      axios
+        .delete(`${API_BASE_URL}/products/${product.id}`)
         .then(response => {
           resolve(response.data);
         })

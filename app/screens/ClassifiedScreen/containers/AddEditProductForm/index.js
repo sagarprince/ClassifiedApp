@@ -44,7 +44,9 @@ const AddEditProductForm = ({categoryId, productInfo, type, mode}) => {
     ),
   });
 
-  productInfo.price = productInfo.price.toString();
+  if (Object.keys(productInfo).length > 0) {
+    productInfo.price = productInfo.price.toString();
+  }
 
   let formState = {
     categoryId: categoryId,
@@ -63,7 +65,7 @@ const AddEditProductForm = ({categoryId, productInfo, type, mode}) => {
       name: 'Sagar Pansare',
     },
     type: type,
-    ...productInfo
+    ...productInfo,
   };
 
   const showToast = (text, toastType) => {
