@@ -1,5 +1,5 @@
 // Core
-import React, { useState, useContext, useEffect, useRef } from 'react';
+import React, {useState, useContext, useEffect, useRef} from 'react';
 import PropTypes from 'prop-types';
 import {
   StyleSheet,
@@ -26,10 +26,10 @@ import {
 import Geolocation from '@react-native-community/geolocation';
 
 // Context
-import { ClassifiedContext } from '../../context';
+import {ClassifiedContext} from '../../context';
 
 // Hooks
-import { useFormInput, useDebounce } from '../../hooks';
+import {useFormInput, useDebounce} from '../../hooks';
 
 const PlacesAutocompleteModal = ({
   type,
@@ -54,7 +54,7 @@ const PlacesAutocompleteModal = ({
     isSelectedLoading: false,
   });
   const [isGPSSearching, setGPSSearching] = useState(false);
-  const { value, onChange: setSearchTerm } = useFormInput(
+  const {value, onChange: setSearchTerm} = useFormInput(
     type === 'global' ? places.searchTerm : '',
   );
   const debouncedSearchTerm = useDebounce(value, 300);
@@ -75,7 +75,7 @@ const PlacesAutocompleteModal = ({
   const onModalHide = () => {
     isModalVisible.current = false;
     if (type === 'user') {
-      setPlaces(type, { searchTerm: value });
+      setPlaces(type, {searchTerm: value});
     }
     setGPSSearching(false);
     onDestroy();
@@ -133,7 +133,11 @@ const PlacesAutocompleteModal = ({
 
   const onSetPlaceSelection = (item, data) => {
     const entities = setPlaceSelected(item, data);
-    setPlaces(type, { isGPSEnabled: false, entities: entities, isSelectedLoading: false });
+    setPlaces(type, {
+      isGPSEnabled: false,
+      entities: entities,
+      isSelectedLoading: false,
+    });
   };
 
   const onPlaceSelection = item => {
@@ -143,7 +147,7 @@ const PlacesAutocompleteModal = ({
     onSetPlaceSelection(item);
     const selected = getPlaceSelected();
     if (selected && selected.lat === '') {
-      setPlaces(type, { isSelectedLoading: true });
+      setPlaces(type, {isSelectedLoading: true});
       forwardGeocodeSub.current = fetchForwardGeocode(selected.name).subscribe(
         data => {
           console.log(selected.name, data);
@@ -166,7 +170,11 @@ const PlacesAutocompleteModal = ({
           name => {
             setGPSSearching(false);
             const entities = setPlaceSelected();
-            setPlaces(type, { isGPSEnabled: true, entities: entities, isSelectedLoading: false });
+            setPlaces(type, {
+              isGPSEnabled: true,
+              entities: entities,
+              isSelectedLoading: false,
+            });
             onDoneLocation({
               name,
               lat: coords[0],
@@ -186,17 +194,17 @@ const PlacesAutocompleteModal = ({
           'Unable to find current location, please check your device gps settings.',
         );
       },
-      { enableHighAccuracy: false, timeout: 3000, maximumAge: 1000 },
+      {enableHighAccuracy: false, timeout: 3000, maximumAge: 1000},
     );
   };
 
   const setPlaceItemHightlight = item => {
-    return { backgroundColor: item.selected ? '#eee' : 'transparent' };
+    return {backgroundColor: item.selected ? '#eee' : 'transparent'};
   };
 
   const SetCurrentLocationRow = () => {
-    const active = places.isGPSEnabled ? { backgroundColor: '#eee' } : {};
-    const activeIcon = places.isGPSEnabled ? { color: '#8EBF37' } : {};
+    const active = places.isGPSEnabled ? {backgroundColor: '#eee'} : {};
+    const activeIcon = places.isGPSEnabled ? {color: '#8EBF37'} : {};
     console.log(active);
     return (
       <View style={[styles.currentLocation, active]}>
@@ -215,17 +223,13 @@ const PlacesAutocompleteModal = ({
             />
           )}
           {isGPSSearching && (
-            <ActivityIndicator
-              style={styles.currentLocationLoading}
-            />
+            <ActivityIndicator style={styles.currentLocationLoading} />
           )}
-          <Text style={styles.currentLocationBtnText}>
-            Current Location
-          </Text>
+          <Text style={styles.currentLocationBtnText}>Current Location</Text>
         </TouchableOpacity>
       </View>
     );
-  }
+  };
 
   const onDestroy = () => {
     if (subscription.current) {
@@ -300,16 +304,16 @@ const PlacesAutocompleteModal = ({
                 />
               </TouchableOpacity>
             ) : (
-                  <Icon name="search" />
-                )}
+              <Icon name="search" />
+            )}
           </Item>
           <View style={styles.listing}>
             <FlatList
               data={places.entities}
               ListHeaderComponent={() => {
-                return <SetCurrentLocationRow />
+                return <SetCurrentLocationRow />;
               }}
-              renderItem={({ item }) => {
+              renderItem={({item}) => {
                 return (
                   <TouchableOpacity
                     style={[styles.placeItem, setPlaceItemHightlight(item)]}

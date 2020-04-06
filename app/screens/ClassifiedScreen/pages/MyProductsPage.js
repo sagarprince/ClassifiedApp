@@ -23,13 +23,13 @@ export default function MyProductsPage() {
       <UserLocationBox />
       <ContentView style={styles.padding}>
         <View style={styles.heading}>
-        <Text style={styles.headingText}>My Products</Text>
+          <Text style={styles.headingText}>My Products</Text>
           <Icon
             type="Entypo"
             name="chevron-small-right"
             style={styles.headingIcon}
           />
-            <Text style={styles.headingText}>{categoryName}</Text>
+          <Text style={styles.headingText}>{categoryName}</Text>
         </View>
         <MyProductsListing categoryId={id} />
       </ContentView>

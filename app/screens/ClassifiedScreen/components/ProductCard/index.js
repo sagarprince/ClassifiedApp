@@ -13,14 +13,18 @@ const ProductCard = ({product, onPress, showType, style}) => {
     'https://www.preston-ps.vic.edu.au/images/No_Image_Available-1.jpg';
   const photo =
     product.photos && product.photos.length > 0 ? product.photos[0] : {};
-  const frequency = frequencyOptions.find((option) => option.value === product.frequency);
-  
+  const frequency = frequencyOptions.find(
+    option => option.value === product.frequency,
+  );
+
   return (
     <TouchableOpacity
       style={[styles.block, {...style}]}
       onPress={() => onPress && onPress(product.id)}>
       <View style={styles.blockInner}>
-        {showType && <Text style={styles.type}>{product.type.toUpperCase()}</Text>}
+        {showType && (
+          <Text style={styles.type}>{product.type.toUpperCase()}</Text>
+        )}
         <ProgressiveImage
           loadingIndicatorSize="large"
           placeholderSource={{uri: photo.thumbUrl || placeholder}}
@@ -34,7 +38,11 @@ const ProductCard = ({product, onPress, showType, style}) => {
           <View style={styles.row}>
             <Icon type="FontAwesome" name="inr" style={styles.icon} />
             <Text style={styles.price}>{product.price}</Text>
-            {product.type === 'rent' && frequency && <Text numberOfLines={1} style={styles.frequency}>({frequency.label})</Text>}
+            {product.type === 'rent' && frequency && (
+              <Text numberOfLines={1} style={styles.frequency}>
+                ({frequency.label})
+              </Text>
+            )}
           </View>
           <View style={styles.row}>
             <Icon type="FontAwesome" name="map-marker" style={styles.icon} />
@@ -50,7 +58,7 @@ const ProductCard = ({product, onPress, showType, style}) => {
 
 ProductCard.defaultProps = {
   style: {},
-  showType: false
+  showType: false,
 };
 
 ProductCard.propTypes = {
@@ -96,7 +104,7 @@ const styles = StyleSheet.create({
     height: 70,
     paddingTop: 54,
     paddingRight: 20,
-    transform: [{ rotate: '-45deg'}],
+    transform: [{rotate: '-45deg'}],
     fontSize: 11,
     fontWeight: '500',
     textAlign: 'center',
@@ -136,7 +144,7 @@ const styles = StyleSheet.create({
     color: '#39405B',
     fontSize: 12,
     marginLeft: 3,
-    marginTop: 10
+    marginTop: 10,
   },
   address: {
     marginTop: 10,

@@ -31,11 +31,12 @@ export default function AddEditProductPage() {
             {type === 'sell' ? 'Sell' : 'Rent'}
           </Text>
         </View>
-        <AddEditProductForm 
-          categoryId={id}  
+        <AddEditProductForm
+          categoryId={id}
           productInfo={productInfo}
-          type={type} 
-          mode={mode} />
+          type={type}
+          mode={mode}
+        />
       </ContentView>
     </Container>
   );
