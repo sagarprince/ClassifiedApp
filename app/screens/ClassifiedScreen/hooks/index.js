@@ -1,5 +1,5 @@
 export * from './useFormInput';
 export * from './useDebounce';
-export * from './useDimenstions';
+export * from './useDimensions';
 export * from './useParentNavigation';
 export * from './useCategory';

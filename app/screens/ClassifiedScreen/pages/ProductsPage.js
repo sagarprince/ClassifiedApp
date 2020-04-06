@@ -9,6 +9,7 @@ import {useParentNavigation, useCategory} from '../hooks';
 
 // Components
 import ContentView from '../components/ContentView';
+import UserLocationBox from '../containers/UserLocationBox';
 
 export default function ProductsPage() {
   useParentNavigation();
@@ -18,6 +19,7 @@ export default function ProductsPage() {
 
   return (
     <Container style={styles.container}>
+      <UserLocationBox />
       <ContentView style={styles.padding}>
         <Text>{category && category.name}</Text>
         <Text>{type === 'buy' ? 'Buy' : 'Rent'} from below products</Text>

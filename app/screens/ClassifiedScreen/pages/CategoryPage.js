@@ -9,6 +9,7 @@ import {useParentNavigation, useCategory} from '../hooks';
 
 // Components
 import ContentView from '../components/ContentView';
+import UserLocationBox from '../containers/UserLocationBox';
 
 export default function CategoryPage() {
   const navigation = useParentNavigation();
@@ -18,15 +19,18 @@ export default function CategoryPage() {
 
   return (
     <Container style={styles.container}>
+      <UserLocationBox />
       <ContentView style={styles.padding}>
         <View style={styles.centered}>
-          {category && (
-            <Image
-              source={category.icon}
-              resizeMode={'contain'}
-              style={styles.headingIcon}
-            />
-          )}
+          <View style={styles.headingIcon}>
+            {category && (
+              <Image
+                source={category.icon}
+                resizeMode={'contain'}
+                style={styles.headingIcon}
+              />
+            )}
+          </View>
           <Text style={styles.heading}>{category && category.name}</Text>
         </View>
         <View style={styles.grid}>
@@ -39,7 +43,11 @@ export default function CategoryPage() {
           <Button
             style={styles.button}
             onPress={() =>
-              navigation.navigate('AddEditProduct', {id, type: 'sell'})
+              navigation.navigate('AddEditProduct', {
+                id,
+                type: 'sell',
+                mode: 'add',
+              })
             }>
             <Text style={styles.buttonText}>I want to Sell</Text>
             <Icon type="Entypo" name="chevron-thin-right" style={styles.icon} />
@@ -53,9 +61,19 @@ export default function CategoryPage() {
           <Button
             style={styles.button}
             onPress={() =>
-              navigation.navigate('AddEditProduct', {id, type: 'rent'})
+              navigation.navigate('AddEditProduct', {
+                id,
+                type: 'rent',
+                mode: 'add',
+              })
             }>
             <Text style={styles.buttonText}>I want to give on Rent</Text>
+            <Icon type="Entypo" name="chevron-thin-right" style={styles.icon} />
+          </Button>
+          <Button
+            style={styles.button}
+            onPress={() => navigation.navigate('MyProducts', {id})}>
+            <Text style={styles.buttonText}>My Products</Text>
             <Icon type="Entypo" name="chevron-thin-right" style={styles.icon} />
           </Button>
         </View>

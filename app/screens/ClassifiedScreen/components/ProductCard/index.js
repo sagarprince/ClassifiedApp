@@ -3,29 +3,45 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {StyleSheet, TouchableOpacity, Platform, View} from 'react-native';
 import {Text, Icon} from 'native-base';
+// Constants
+import {frequencyOptions} from '../../constants';
 // Components
 import ProgressiveImage from '../ProgressiveImage';
 
-const ProductCard = ({product, onPress, style}) => {
-  const image = product.photos && product.photos[0];
+const ProductCard = ({product, onPress, showType, style}) => {
+  const placeholder =
+    'https://www.preston-ps.vic.edu.au/images/No_Image_Available-1.jpg';
+  const photo =
+    product.photos && product.photos.length > 0 ? product.photos[0] : {};
+  const frequency = frequencyOptions.find((option) => option.value === product.frequency);
+  
   return (
     <TouchableOpacity
       style={[styles.block, {...style}]}
       onPress={() => onPress && onPress(product.id)}>
-      <ProgressiveImage
-        loadingIndicatorSize="large"
-        source={{uri: image}}
-        style={styles.image}
-      />
-      <View style={styles.info}>
-        <Text style={styles.name}>{product.name}</Text>
-        <View style={styles.row}>
-          <Icon type="FontAwesome" name="inr" style={styles.icon} />
-          <Text style={styles.price}>{product.price}</Text>
-        </View>
-        <View style={styles.row}>
-          <Icon type="FontAwesome" name="map-marker" style={styles.icon} />
-          <Text style={styles.address}>{product.address}</Text>
+      <View style={styles.blockInner}>
+        {showType && <Text style={styles.type}>{product.type.toUpperCase()}</Text>}
+        <ProgressiveImage
+          loadingIndicatorSize="large"
+          placeholderSource={{uri: photo.thumbUrl || placeholder}}
+          source={{uri: photo.url || placeholder}}
+          style={styles.image}
+        />
+        <View style={styles.info}>
+          <Text style={styles.name} numberOfLines={1}>
+            {product.title}
+          </Text>
+          <View style={styles.row}>
+            <Icon type="FontAwesome" name="inr" style={styles.icon} />
+            <Text style={styles.price}>{product.price}</Text>
+            {product.type === 'rent' && frequency && <Text numberOfLines={1} style={styles.frequency}>({frequency.label})</Text>}
+          </View>
+          <View style={styles.row}>
+            <Icon type="FontAwesome" name="map-marker" style={styles.icon} />
+            <Text style={styles.address} numberOfLines={1}>
+              {product.location.name}
+            </Text>
+          </View>
         </View>
       </View>
     </TouchableOpacity>
@@ -33,7 +49,8 @@ const ProductCard = ({product, onPress, style}) => {
 };
 
 ProductCard.defaultProps = {
-  style: {}
+  style: {},
+  showType: false
 };
 
 ProductCard.propTypes = {
@@ -44,10 +61,8 @@ ProductCard.propTypes = {
 const styles = StyleSheet.create({
   block: {
     padding: 0,
-    width: 200,
-    height: 250,
-    marginHorizontal: 20,
-    marginBottom: 20,
+    width: '100%',
+    height: 230,
     backgroundColor: '#FFF',
     borderRadius: 10,
     elevation: 4,
@@ -67,11 +82,29 @@ const styles = StyleSheet.create({
       },
     }),
   },
+  blockInner: {
+    borderRadius: 10,
+    overflow: 'hidden',
+  },
+  type: {
+    position: 'absolute',
+    top: -45,
+    left: -45,
+    backgroundColor: '#0EBF37',
+    color: '#fff',
+    width: 100,
+    height: 70,
+    paddingTop: 54,
+    paddingRight: 20,
+    transform: [{ rotate: '-45deg'}],
+    fontSize: 11,
+    fontWeight: '500',
+    textAlign: 'center',
+    zIndex: 2,
+  },
   image: {
     width: '100%',
-    height: 140,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
+    height: 120,
   },
   info: {
     paddingHorizontal: 15,
@@ -97,13 +130,20 @@ const styles = StyleSheet.create({
     marginTop: 10,
     color: '#39405B',
     fontWeight: '500',
-    fontSize: 15,
+    fontSize: 14,
+  },
+  frequency: {
+    color: '#39405B',
+    fontSize: 12,
+    marginLeft: 3,
+    marginTop: 10
   },
   address: {
     marginTop: 10,
     color: '#39405B',
     fontWeight: '400',
-    fontSize: 15,
+    fontSize: 14,
+    paddingRight: 10,
   },
 });
 

@@ -7,13 +7,11 @@ import {createStackNavigator} from '@react-navigation/stack';
 // Context
 import {ClassifiedProvider} from './context';
 
-// Components
-import TopLocationBar from './containers/TopLocationBar';
-
 // Pages
 import HomePage from './pages/HomePage';
 import CategoryPage from './pages/CategoryPage';
 import ProductsPage from './pages/ProductsPage';
+import MyProductsPage from './pages/MyProductsPage';
 import AddEditProductPage from './pages/AddEditProductPage';
 import AlertsPage from './pages/AlertsPage';
 
@@ -23,7 +21,6 @@ const Stack = createStackNavigator();
 const ClassifiedScreen = () => {
   return (
     <ClassifiedProvider>
-      <TopLocationBar />
       <Stack.Navigator initialRouteName="Home" headerMode="none">
         <Stack.Screen
           name="Home"
@@ -38,6 +35,11 @@ const ClassifiedScreen = () => {
         <Stack.Screen
           name="Products"
           component={ProductsPage}
+          initialParams={{isHome: false}}
+        />
+        <Stack.Screen
+          name="MyProducts"
+          component={MyProductsPage}
           initialParams={{isHome: false}}
         />
         <Stack.Screen

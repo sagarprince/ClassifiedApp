@@ -1,12 +1,14 @@
 // Core
-import React, {useEffect, useCallback, useContext} from 'react';
+import React, {useEffect, useCallback, useContext, useRef} from 'react';
 import {
   StyleSheet,
   View,
   Text,
   FlatList,
   ActivityIndicator,
+  TouchableOpacity,
 } from 'react-native';
+import {Icon} from 'native-base';
 import {useNavigation} from '@react-navigation/native';
 
 // Context
@@ -16,44 +18,69 @@ import {ClassifiedContext} from '../../context';
 import ProductCard from '../../components/ProductCard';
 
 const MyRecommendations = () => {
-  const {recommendations, loadRecommendations} = useContext(ClassifiedContext);
+  const {recommendations, fetchRecommendations} = useContext(ClassifiedContext);
   const navigation = useNavigation();
-
-  const onPress = useCallback(
-    id => {
-      navigation.navigate('CategoryActions', {id});
-    },
-    [navigation],
-  );
+  const subscription = useRef(null);
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
-      loadRecommendations();
+      subscription.current = fetchRecommendations().subscribe(() => {});
     });
-    return () => cancelAnimationFrame(frame);
+    return () => {
+      onDestroy();
+      cancelAnimationFrame(frame);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const onDestroy = () => {
+    if (subscription.current) {
+      subscription.current.unsubscribe();
+    }
+  };
+
+  const onPress = useCallback(id => {
+    // navigation.navigate('CategoryActions', {id});
   }, []);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>My Recommendations</Text>
-      {recommendations.isLoading && (
+      <View style={styles.header}>
+        <Text style={styles.headerText}>My Recommendations</Text>
+        <TouchableOpacity onPress={() => fetchRecommendations().subscribe()}>
+          {!recommendations.isLoading && (
+            <Icon
+              type="Feather"
+              name="refresh-cw"
+              style={styles.refreshBtnIcon}
+            />
+          )}
+          {recommendations.isLoading && recommendations.entities.length > 0 && (
+            <ActivityIndicator color="#8EBF37" />
+          )}
+        </TouchableOpacity>
+      </View>
+      {recommendations.isLoading && recommendations.entities.length === 0 && (
         <ActivityIndicator size="large" color="#8EBF37" style={styles.loader} />
       )}
       {recommendations.error !== '' && (
         <Text style={styles.error}>{recommendations.error}</Text>
       )}
-      {!recommendations.isLoading && recommendations.entities.length === 0 && (
-        <View style={styles.noResults}>
-          <Text>No Recommendations Found...</Text>
-        </View>
-      )}
+      {!recommendations.isLoading &&
+        recommendations.error === '' &&
+        recommendations.entities.length === 0 && (
+          <View style={styles.noResults}>
+            <Text>No Recommendations Listed.</Text>
+          </View>
+        )}
       <FlatList
         horizontal={true}
         showsHorizontalScrollIndicator={false}
         data={recommendations.entities}
         renderItem={({item}) => (
-          <ProductCard product={item} onPress={onPress} />
+          <View style={styles.productCol}>
+            <ProductCard product={item} onPress={onPress} showType={true} />
+          </View>
         )}
         keyExtractor={item => item.id.toString()}
       />
@@ -66,22 +93,36 @@ const styles = StyleSheet.create({
     marginTop: 25,
   },
   header: {
-    color: '#39405B',
-    marginLeft: 3,
-    fontSize: 18,
-    fontWeight: '500',
     marginTop: 5,
     marginBottom: 25,
-    paddingHorizontal: 15,
+    paddingLeft: 18,
+    paddingRight: 18,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  headerText: {
+    color: '#39405B',
+    fontSize: 18,
+    fontWeight: '500',
+  },
+  refreshBtnIcon: {
+    color: '#39405B',
+    fontSize: 20,
   },
   loader: {
     marginTop: 35,
     marginBottom: 35,
   },
+  productCol: {
+    width: 200,
+    paddingHorizontal: 10,
+    paddingBottom: 25,
+  },
   error: {
     textAlign: 'center',
     fontSize: 15,
-    color: 'red',
+    color: '#ED1D01',
     marginTop: 10,
     marginBottom: 35,
   },
