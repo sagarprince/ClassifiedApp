@@ -1,59 +1,35 @@
-import React, { useReducer } from 'react';
-import { of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import React, {useReducer} from 'react';
+import {of} from 'rxjs';
+import {map, catchError} from 'rxjs/operators';
 import reducer from './reducer';
-import { categories } from './categories';
 import apiService from './api.service';
-
-const initialState = {
-  currentLocation: {},
-  search: '',
-  categories: categories,
-  places: {
-    searchTerm: '',
-    isLoading: false,
-    isSelectedLoading: false,
-    globalEntities: [],
-    entities: [],
-    error: '',
-  },
-  products: {
-    isLoading: true,
-    entities: [],
-    error: '',
-  },
-  productCRUD: {
-    isLoading: false,
-  },
-  recommendations: {
-    isLoading: true,
-    entities: [],
-    error: '',
-  },
-  alerts: {
-    isLoading: true,
-    entities: [],
-    error: '',
-  },
-  alertCRUD: {
-    isLoading: true
-  }
-};
+import {initialState} from './initial.state';
 
 const ClassifiedContext = React.createContext();
 
 function ClassifiedProvider(props) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const setPlaces = payload => {
-    dispatch({
-      payload: {
-        places: {
-          ...state.places,
-          ...payload,
+  const setPlaces = (type, payload) => {
+    if (type === 'user') {
+      dispatch({
+        payload: {
+          userPlaces: {
+            ...state.userPlaces,
+            ...payload,
+          },
         },
-      },
-    });
+      });
+    } else {
+      dispatch({
+        payload: {
+          productFormPlaces: {
+            ...state.productFormPlaces,
+            ...payload,
+          },
+        },
+      });
+    }
   };
 
   const setRecommendations = payload => {
@@ -101,102 +77,102 @@ function ClassifiedProvider(props) {
   };
 
   const fetchPlaces = (type, searchTerm) => {
-    setPlaces({ isLoading: true, error: '' });
+    setPlaces(type, {isLoading: true, error: ''});
     return apiService.fetchPlaces(searchTerm).pipe(
-      map((entities) => {
-        if (type === 'global') {
-          console.log('set global ', searchTerm, entities);
-          setPlaces({ globalEntities: entities, isLoading: false, error: '' });
-        } else {
-          setPlaces({ entities, isLoading: false, error: '' });
-        }
+      map(entities => {
+        console.log('ENTITIES ', entities.map(x => x.name));
+        setPlaces(type, {entities, isLoading: false, error: ''});
         return entities;
       }),
-      catchError((err) => {
-        setPlaces({
-          globalEntities: [],
+      catchError(err => {
+        setPlaces(type, {
           entities: [],
-          error: err.toString() || 'Something went wrong, please try again.',
           isLoading: false,
+          error: err.toString() || 'Something went wrong, please try again.',
         });
-      })
+        return of(err);
+      }),
     );
   };
 
-  const fetchForwardGeocode = (address) => {
+  const fetchForwardGeocode = address => {
     return apiService.fetchForwardGeocode(address);
   };
 
-  const fetchReverseGeocode = (location) => {
+  const fetchReverseGeocode = location => {
     return apiService.fetchReverseGeocode(location);
   };
 
   const fetchRecommendations = () => {
-    setRecommendations({ isLoading: true, error: '' });
+    setRecommendations({isLoading: true, error: ''});
     return apiService.fetchRecommendations().pipe(
-      map((entities) => {
+      map(entities => {
         console.log(entities);
-        setRecommendations({ entities, isLoading: false, error: '' });
+        setRecommendations({entities, isLoading: false, error: ''});
       }),
-      catchError((err) => {
+      catchError(err => {
         setRecommendations({
           error: err.toString() || 'Something went wrong, please try again.',
           entities: [],
           isLoading: false,
         });
         return of(err);
-      })
+      }),
     );
   };
 
   const fetchProducts = () => {
     requestAnimationFrame(() => {
-      setProducts({ entities: [] });
+      setProducts({entities: []});
     });
   };
 
   const fetchAlerts = () => {
     requestAnimationFrame(() => {
-      setAlerts({ entities: [] });
+      setAlerts({entities: []});
     });
   };
 
-  const saveProduct = (product) => {
+  const saveProduct = product => {
     return new Promise((resolve, reject) => {
       requestAnimationFrame(() => {
         const promises = [];
-        setProductCRUD({ isLoading: true });
-        product.photos.forEach((photo) => {
+        setProductCRUD({isLoading: true});
+        product.photos.forEach(photo => {
           promises.push(apiService.saveProductImage(photo.uri));
         });
 
-        Promise.all(promises).then((results) => {
-          const photos = results.map((result) => {
-            const photo = result.data;
-            return {
-              id: photo.id,
-              thumbUrl: photo.thumb.url,
-              url: photo.url,
-              uploaded: true
-            };
-          });
-          product.photos = photos;
-          apiService.saveProduct(product)
-            .then((data) => {
-              resolve(data);
-            })
-            .catch(err => {
-              reject(err);
-            }).finally(() => {
-              setProductCRUD({ isLoading: false });
+        Promise.all(promises)
+          .then(results => {
+            const photos = results.map(result => {
+              const photo = result.data;
+              return {
+                id: photo.id,
+                thumbUrl: photo.thumb.url,
+                url: photo.url,
+                uploaded: true,
+              };
             });
-        }).catch(() => {
-          reject('Something went wrong, please try again.');
-          setProductCRUD({ isLoading: false });
-        })
+            product.photos = photos;
+            apiService
+              .saveProduct(product)
+              .then(data => {
+                resolve(data);
+              })
+              .catch(err => {
+                reject(err);
+              })
+              .finally(() => {
+                setProductCRUD({isLoading: false});
+              });
+          })
+          .catch(() => {
+            reject('Something went wrong, please try again.');
+            setProductCRUD({isLoading: false});
+          });
       });
     });
-  }
+  };
 
   const providerValue = {
     ...state,
@@ -208,7 +184,7 @@ function ClassifiedProvider(props) {
     fetchRecommendations,
     fetchProducts,
     fetchAlerts,
-    saveProduct
+    saveProduct,
   };
 
   return (
@@ -218,4 +194,4 @@ function ClassifiedProvider(props) {
   );
 }
 
-export { ClassifiedContext, ClassifiedProvider };
+export {ClassifiedContext, ClassifiedProvider};

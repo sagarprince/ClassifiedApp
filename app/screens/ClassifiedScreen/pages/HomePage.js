@@ -8,7 +8,7 @@ import {useParentNavigation} from '../hooks';
 
 // Components
 import ContentView from '../components/ContentView';
-import TopLocationBar from '../containers/TopLocationBar';
+import UserLocationBox from '../containers/UserLocationBox';
 import HomeSearchBox from '../containers/HomeSearchBox';
 import Categories from '../containers/Categories';
 import MyRecommendations from '../containers/Recommendations';
@@ -17,7 +17,7 @@ export default function HomePage() {
   useParentNavigation();
   return (
     <Container style={styles.container}>
-      <TopLocationBar />
+      <UserLocationBox />
       <ContentView>
         <View style={styles.padding}>
           <HomeSearchBox />

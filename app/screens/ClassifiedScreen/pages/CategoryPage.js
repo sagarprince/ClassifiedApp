@@ -1,25 +1,25 @@
 // Core
 import React from 'react';
-import { StyleSheet, View, Text, Image } from 'react-native';
-import { Container, Button, Icon } from 'native-base';
-import { useRoute } from '@react-navigation/native';
+import {StyleSheet, View, Text, Image} from 'react-native';
+import {Container, Button, Icon} from 'native-base';
+import {useRoute} from '@react-navigation/native';
 
 // Hooks
-import { useParentNavigation, useCategory } from '../hooks';
+import {useParentNavigation, useCategory} from '../hooks';
 
 // Components
 import ContentView from '../components/ContentView';
-import TopLocationBar from '../containers/TopLocationBar';
+import UserLocationBox from '../containers/UserLocationBox';
 
 export default function CategoryPage() {
   const navigation = useParentNavigation();
   const route = useRoute();
-  const { id } = route.params;
+  const {id} = route.params;
   const category = useCategory(id);
 
   return (
     <Container style={styles.container}>
-      <TopLocationBar />
+      <UserLocationBox />
       <ContentView style={styles.padding}>
         <View style={styles.centered}>
           <View style={styles.headingIcon}>
@@ -36,28 +36,36 @@ export default function CategoryPage() {
         <View style={styles.grid}>
           <Button
             style={styles.button}
-            onPress={() => navigation.navigate('Products', { id, type: 'buy' })}>
+            onPress={() => navigation.navigate('Products', {id, type: 'buy'})}>
             <Text style={styles.buttonText}>I want to Buy</Text>
             <Icon type="Entypo" name="chevron-thin-right" style={styles.icon} />
           </Button>
           <Button
             style={styles.button}
             onPress={() =>
-              navigation.navigate('AddEditProduct', { id, type: 'sell', mode: 'add' })
+              navigation.navigate('AddEditProduct', {
+                id,
+                type: 'sell',
+                mode: 'add',
+              })
             }>
             <Text style={styles.buttonText}>I want to Sell</Text>
             <Icon type="Entypo" name="chevron-thin-right" style={styles.icon} />
           </Button>
           <Button
             style={styles.button}
-            onPress={() => navigation.navigate('Products', { id, type: 'rent' })}>
+            onPress={() => navigation.navigate('Products', {id, type: 'rent'})}>
             <Text style={styles.buttonText}>I want to Rent</Text>
             <Icon type="Entypo" name="chevron-thin-right" style={styles.icon} />
           </Button>
           <Button
             style={styles.button}
             onPress={() =>
-              navigation.navigate('AddEditProduct', { id, type: 'rent', mode: 'add' })
+              navigation.navigate('AddEditProduct', {
+                id,
+                type: 'rent',
+                mode: 'add',
+              })
             }>
             <Text style={styles.buttonText}>I want to give on Rent</Text>
             <Icon type="Entypo" name="chevron-thin-right" style={styles.icon} />

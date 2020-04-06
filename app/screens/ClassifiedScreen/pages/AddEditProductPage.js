@@ -22,8 +22,14 @@ export default function AddEditProductPage() {
       <ContentView style={styles.padding}>
         <View style={styles.heading}>
           <Text style={styles.headingText}>{categoryName}</Text>
-          <Icon type="Entypo" name="chevron-small-right" style={styles.headingIcon} />
-          <Text style={styles.headingText}>{type === 'sell' ? 'Sell' : 'Rent'}</Text>
+          <Icon
+            type="Entypo"
+            name="chevron-small-right"
+            style={styles.headingIcon}
+          />
+          <Text style={styles.headingText}>
+            {type === 'sell' ? 'Sell' : 'Rent'}
+          </Text>
         </View>
         <AddEditProductForm categoryId={id} type={type} mode={mode} />
       </ContentView>
@@ -47,7 +53,7 @@ const styles = StyleSheet.create({
     borderColor: '#39405B',
     backgroundColor: '#f0f0f0',
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   headingIcon: {
     marginTop: 2,
@@ -55,6 +61,6 @@ const styles = StyleSheet.create({
   headingText: {
     color: '#39405B',
     fontSize: 16,
-    fontWeight: "500",
-  }
+    fontWeight: '500',
+  },
 });

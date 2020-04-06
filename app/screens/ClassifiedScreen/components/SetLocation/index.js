@@ -1,22 +1,31 @@
 // Core
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import PropTypes from 'prop-types';
-import { StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { Icon } from 'native-base';
+import {StyleSheet, Text, TouchableOpacity} from 'react-native';
+import {Icon} from 'native-base';
 
 // Components
-import PlacesAutocompleteModal from '../PlacesAutocompleteModal';
+import PlacesAutocompleteModal from '../../containers/PlacesAutocompleteModal';
 
-const SetLocation = ({ type, value, placeholder, onChangeLocation, style }) => {
+const SetLocation = ({type, value, placeholder, onChangeLocation, style}) => {
   const [isModalVisible, setModalVisible] = useState(false);
   return (
     <React.Fragment>
-      <TouchableOpacity style={[styles.setLocationBtn, { ...style }]} onPress={() => setModalVisible(true)}>
+      <TouchableOpacity
+        style={[styles.setLocationBtn, {...style}]}
+        onPress={() => setModalVisible(true)}>
         <Icon type="Feather" name="map-pin" style={styles.locationIcon} />
-        {!value && <Text style={styles.placeholder} numberOfLines={1}>{placeholder}</Text>}
-        <Text style={styles.location} numberOfLines={1}>{value}</Text>
+        {!value && (
+          <Text style={styles.placeholder} numberOfLines={1}>
+            {placeholder}
+          </Text>
+        )}
+        <Text style={styles.location} numberOfLines={1}>
+          {value}
+        </Text>
       </TouchableOpacity>
-      <PlacesAutocompleteModal type={type}
+      <PlacesAutocompleteModal
+        type={type}
         visible={isModalVisible}
         onChangeLocation={onChangeLocation}
         onClose={() => setModalVisible(false)}
@@ -27,14 +36,14 @@ const SetLocation = ({ type, value, placeholder, onChangeLocation, style }) => {
 
 SetLocation.defaultProps = {
   value: '',
-  placeholder: 'Set Location'
+  placeholder: 'Set Location',
 };
 
 SetLocation.propTypes = {
   value: PropTypes.any,
   placeholder: PropTypes.string,
   onChangeLocation: PropTypes.func,
-  style: PropTypes.any
+  style: PropTypes.any,
 };
 
 const styles = StyleSheet.create({
@@ -46,7 +55,7 @@ const styles = StyleSheet.create({
   placeholder: {
     marginLeft: 5,
     fontSize: 16,
-    color: '#acacac'
+    color: '#acacac',
   },
   location: {
     marginLeft: 5,

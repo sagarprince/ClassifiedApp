@@ -1,5 +1,5 @@
 // Core
-import React, { useEffect, useCallback, useContext, useRef } from 'react';
+import React, {useEffect, useCallback, useContext, useRef} from 'react';
 import {
   StyleSheet,
   View,
@@ -8,23 +8,23 @@ import {
   ActivityIndicator,
   TouchableOpacity,
 } from 'react-native';
-import { Icon } from 'native-base';
-import { useNavigation } from '@react-navigation/native';
+import {Icon} from 'native-base';
+import {useNavigation} from '@react-navigation/native';
 
 // Context
-import { ClassifiedContext } from '../../context';
+import {ClassifiedContext} from '../../context';
 
 // Components
 import ProductCard from '../../components/ProductCard';
 
 const MyRecommendations = () => {
-  const { recommendations, fetchRecommendations } = useContext(ClassifiedContext);
+  const {recommendations, fetchRecommendations} = useContext(ClassifiedContext);
   const navigation = useNavigation();
   const subscription = useRef(null);
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
-      subscription.current = fetchRecommendations().subscribe(() => { });
+      subscription.current = fetchRecommendations().subscribe(() => {});
     });
     return () => {
       onDestroy();
@@ -36,25 +36,28 @@ const MyRecommendations = () => {
   const onDestroy = () => {
     if (subscription.current) {
       subscription.current.unsubscribe();
-    };
+    }
   };
 
-  const onPress = useCallback(
-    id => {
-      // navigation.navigate('CategoryActions', {id});
-    },
-    [navigation],
-  );
+  const onPress = useCallback(id => {
+    // navigation.navigate('CategoryActions', {id});
+  }, []);
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerText}>My Recommendations</Text>
         <TouchableOpacity onPress={() => fetchRecommendations().subscribe()}>
-          {!recommendations.isLoading && recommendations.entities.length > 0 &&
-            <Icon type="Feather" name="refresh-cw" style={styles.refreshBtnIcon} ></Icon>}
-          {recommendations.isLoading && recommendations.entities.length > 0 &&
-            <ActivityIndicator color="#8EBF37" />}
+          {!recommendations.isLoading && (
+            <Icon
+              type="Feather"
+              name="refresh-cw"
+              style={styles.refreshBtnIcon}
+            />
+          )}
+          {recommendations.isLoading && recommendations.entities.length > 0 && (
+            <ActivityIndicator color="#8EBF37" />
+          )}
         </TouchableOpacity>
       </View>
       {recommendations.isLoading && recommendations.entities.length === 0 && (
@@ -63,16 +66,18 @@ const MyRecommendations = () => {
       {recommendations.error !== '' && (
         <Text style={styles.error}>{recommendations.error}</Text>
       )}
-      {!recommendations.isLoading && recommendations.error === '' && recommendations.entities.length === 0 && (
-        <View style={styles.noResults}>
-          <Text>No Recommendations Listed.</Text>
-        </View>
-      )}
+      {!recommendations.isLoading &&
+        recommendations.error === '' &&
+        recommendations.entities.length === 0 && (
+          <View style={styles.noResults}>
+            <Text>No Recommendations Listed.</Text>
+          </View>
+        )}
       <FlatList
         horizontal={true}
         showsHorizontalScrollIndicator={false}
         data={recommendations.entities}
-        renderItem={({ item }) => (
+        renderItem={({item}) => (
           <ProductCard product={item} onPress={onPress} />
         )}
         keyExtractor={item => item.id.toString()}
@@ -110,7 +115,7 @@ const styles = StyleSheet.create({
   error: {
     textAlign: 'center',
     fontSize: 15,
-    color: 'red',
+    color: '#ED1D01',
     marginTop: 10,
     marginBottom: 35,
   },

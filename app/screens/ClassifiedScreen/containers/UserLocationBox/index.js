@@ -1,17 +1,17 @@
 // Core
-import React, { useCallback, useContext, useState, useEffect } from 'react';
-import { StyleSheet, View, TouchableOpacity } from 'react-native';
-import { Icon } from 'native-base';
-import { useNavigation } from '@react-navigation/native';
+import React, {useCallback, useContext} from 'react';
+import {StyleSheet, View, TouchableOpacity} from 'react-native';
+import {Icon} from 'native-base';
+import {useNavigation} from '@react-navigation/native';
 
 // Context
-import { ClassifiedContext } from '../../context';
+import {ClassifiedContext} from '../../context';
 
 // Components
 import SetLocation from '../../components/SetLocation';
 
-const TopLocationBar = () => {
-  const { currentLocation, dispatch } = useContext(ClassifiedContext);
+const UserLocationBox = () => {
+  const {userLocation, dispatch} = useContext(ClassifiedContext);
   const navigation = useNavigation();
 
   const gotoAlerts = useCallback(() => {
@@ -20,10 +20,11 @@ const TopLocationBar = () => {
 
   return (
     <View style={styles.container}>
-      <SetLocation type={'global'}
-        value={currentLocation.name}
+      <SetLocation
+        type={'user'}
+        value={userLocation.name}
         placeholder={'Your Location'}
-        onChangeLocation={(value) => dispatch({ payload: { currentLocation: value } })}
+        onChangeLocation={value => dispatch({payload: {userLocation: value}})}
         style={styles.setLocationBtn}
       />
       <TouchableOpacity onPress={gotoAlerts}>
@@ -48,7 +49,7 @@ const styles = StyleSheet.create({
     paddingTop: 4,
     height: 55,
     backgroundColor: 'transparent',
-    width: '82%'
+    width: '82%',
   },
   alertsIcon: {
     color: '#333',
@@ -56,4 +57,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TopLocationBar;
+export default UserLocationBox;
